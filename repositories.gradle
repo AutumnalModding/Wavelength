@@ -1,0 +1,10 @@
+// Add any additional repositiroes for your dependencies here
+
+repositories {
+    mavenCentral()
+
+    maven { url = "https://cursemaven.com" }
+    maven { url = "https://maven.bawnorton.com/releases/" }
+    maven { url = "https://mvn.falsepattern.com/cursemaven" }
+    maven { url = "https://mvn.falsepattern.com/releases" }
+}

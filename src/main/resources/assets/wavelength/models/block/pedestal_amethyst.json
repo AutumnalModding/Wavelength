@@ -1,0 +1,7 @@
+{
+  "parent": "wavelength:templates/pedestal",
+  "textures": {
+    "particle": "wavelength:block/pedestal_amethyst_breaking",
+    "pedestal": "wavelength:block/pedestal_amethyst"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "wavelength:block/pedestal_onyx"
+    }
+  }
+}
