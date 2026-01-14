@@ -2,9 +2,12 @@ package xyz.lilyflower.wavelength.redist;
 
 import gnu.trove.list.TDoubleList;
 import gnu.trove.list.array.TDoubleArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.*;
 import java.util.function.LongFunction;
 import xyz.lilyflower.solaris.util.SolarisExtensions;
 
@@ -20,7 +23,7 @@ public class OctavePerlinNoiseSampler implements NoiseSampler {
 //   }
 
 	public OctavePerlinNoiseSampler(Random random, List<Integer> octaves) {
-		this(random, new TreeSet<Integer>(octaves));
+		this(random, new TreeSet<>(octaves));
 	}
 
 	public static OctavePerlinNoiseSampler create(Random random, int offset, double... amplitudes) {
@@ -42,12 +45,10 @@ public class OctavePerlinNoiseSampler implements NoiseSampler {
 			throw new IllegalArgumentException("Total number of octaves needs to be >= 1");
 		}
 		TDoubleList doubleList = new TDoubleArrayList(new double[k]);
-		Iterator<Integer> intBidirectionalIterator = octaves.iterator();
 
-		while (intBidirectionalIterator.hasNext()) {
-			int l = intBidirectionalIterator.next();
-			doubleList.set(l + i, 1.0D);
-		}
+        for (int octave : octaves) {
+            doubleList.set(octave + i, 1.0D);
+        }
 
 		return Pair.of(-i, doubleList);
 	}

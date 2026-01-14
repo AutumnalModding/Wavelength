@@ -3,7 +3,6 @@ package xyz.lilyflower.wavelength.redist;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
-import org.jetbrains.annotations.Nullable;
 
 public final class ItemMeta2ObjectOpenHashMap<V> extends ObjMeta2ObjectOpenHashMap<ItemMetaPair, Item, V> {
     /// @param wildcardFallback
@@ -28,7 +27,7 @@ public final class ItemMeta2ObjectOpenHashMap<V> extends ObjMeta2ObjectOpenHashM
     }
 
     /// Only evaluates the item and metadata, the NBT data for this {@link ItemStack} is NOT evaluated.
-    public @Nullable V put(ItemStack key, V value) {
+    public V put(ItemStack key, V value) {
         return put(key.getItem(), key.getItemDamage(), value);
     }
 

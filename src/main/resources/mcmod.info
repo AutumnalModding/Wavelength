@@ -1,16 +1,21 @@
 [
-{
-  "modid": "wavelength",
-  "name": "Wavelength",
-  "description": "Port of Spectrum to 1.7.10.",
-  "version": "1.0",
-  "mcversion": "1.7.10",
-  "url": "",
-  "updateUrl": "",
-  "authorList": ["LilyflowerFDL"],
-  "credits": "",
-  "logoFile": "",
-  "screenshots": [],
-  "dependencies": []
-}
+  {
+    "modid": "wavelength",
+    "name": "Wavelength",
+    "description": "Port of Spectrum to 1.7.10.",
+    "version": "1.0",
+    "mcversion": "1.7.10",
+    "url": "https://discord.gg/PpGfzEeBPM",
+    "updateUrl": "",
+    "authorList": [
+      "LilyflowerFDL",
+      "Notawallplan"
+    ],
+    "credits": "",
+    "logoFile": "",
+    "screenshots": [],
+    "dependencies": [
+      "solaris"
+    ]
+  }
 ]

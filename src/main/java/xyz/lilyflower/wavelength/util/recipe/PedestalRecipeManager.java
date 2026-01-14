@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import xyz.lilyflower.wavelength.content.block.entity.TileEntityPedestal;
 import xyz.lilyflower.wavelength.util.PedestalRecipe;
@@ -34,7 +35,7 @@ public class PedestalRecipeManager {
         this.cache.clear();
     }
     
-    public PedestalRecipe find(TileEntityPedestal pedestal, ItemStack[] grid, EntityPlayerMP player) {
+    public PedestalRecipe find(TileEntityPedestal pedestal, ItemStack[] grid, EntityPlayer player) {
         if (grid.length != 9) {
             return null;
         }
@@ -48,7 +49,7 @@ public class PedestalRecipeManager {
         }
         
         for (PedestalRecipe recipe : cached) {
-            if (recipe.unlocked().apply(player) && pedestal.tier().ordinal() >= recipe.tier()) {
+            if (recipe.unlocked().apply(player) && pedestal.tier.ordinal() >= recipe.tier()) {
                 return recipe;
             }
         }

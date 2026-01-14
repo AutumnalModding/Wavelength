@@ -63,7 +63,8 @@ public class Wavelength {
                 new HashMap<>(),
                 60,
                 player -> true,
-                0
+                0,
+                pedestal -> {}
             )
         );
 
@@ -86,7 +87,7 @@ public class Wavelength {
                 )
         );
 
-        WavelengthTab.MATERIALS.setIcon(WavelengthItemRegistry.SHARD_AMETHYST);
+        WavelengthTab.RESOURCES.setIcon(WavelengthItemRegistry.SHARD_AMETHYST);
     }
 
     @Mod.EventHandler

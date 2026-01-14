@@ -4,7 +4,6 @@ import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
-
 /// Should only pass in {@link Block} or {@link Item} as the type
 public interface IReferenceBase<T> {
     default ItemStack newItemStack() {

@@ -1,4 +1,4 @@
-package xyz.lilyflower.wavelength.content.block.generic;
+package xyz.lilyflower.wavelength.content.block;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;

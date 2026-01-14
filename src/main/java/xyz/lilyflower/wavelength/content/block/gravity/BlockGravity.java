@@ -1,23 +1,34 @@
-package xyz.lilyflower.wavelength.content.block.generic;
+package xyz.lilyflower.wavelength.content.block.gravity;
 
+import java.util.List;
 import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
+import xyz.lilyflower.solaris.util.SolarisExtensions;
+import xyz.lilyflower.wavelength.api.IGravityModifier;
 import xyz.lilyflower.wavelength.content.WavelengthTab;
 import xyz.lilyflower.wavelength.content.entity.EntityGravityBlock;
+import xyz.lilyflower.wavelength.util.ChainedArrayList;
 
-public class BlockGravity extends Block {
-    public final boolean instant;
-    public final EnumFacing direction;
+public class BlockGravity extends Block implements IGravityModifier {
+    private final List<SolarisExtensions.TriPair<Action, EnumFacing, Float>> modifiers;
+    private final EnumFacing direction;
 
-    public BlockGravity(Material material, EnumFacing direction, boolean instant) {
+    public BlockGravity(Material material, List<SolarisExtensions.TriPair<Action, EnumFacing, Float>> modifiers, EnumFacing direction) {
         super(material);
+        this.modifiers = modifiers;
         this.direction = direction;
-        this.instant = instant;
         this.setCreativeTab(WavelengthTab.BLOCKS);
+    }
+
+    public BlockGravity(Material material, EnumFacing direction, float amount) {
+        this(material,
+                new ChainedArrayList<SolarisExtensions.TriPair<Action, EnumFacing, Float>>().chainedAdd(
+                new SolarisExtensions.TriPair<>(Action.ADD, direction, amount)
+        ), direction);
     }
 
     @Override
@@ -47,7 +58,7 @@ public class BlockGravity extends Block {
 
         if (valid && y >= 0) {
             byte offset = 32;
-            if (!instant && world.checkChunksExist(x - offset, y - offset, z - offset, x + offset, y + offset, z + offset)) {
+            if (world.checkChunksExist(x - offset, y - offset, z - offset, x + offset, y + offset, z + offset)) {
                 if (!world.isRemote) {
                     EntityGravityBlock entity = new EntityGravityBlock(world, (float) x + 0.5F, (float) y + 0.5F, (float) z + 0.5F, this, world.getBlockMetadata(x, y, z));
                     entity.direction = this.direction;
@@ -65,5 +76,10 @@ public class BlockGravity extends Block {
         Block block = world.getBlock(x, y, z);
         Material material = block.getMaterial();
         return material == Material.water || material == Material.lava || block.isAir(world, x, y, z) || block == Blocks.fire;
+    }
+
+    @Override
+    public List<SolarisExtensions.TriPair<Action, EnumFacing, Float>> modifiers() {
+        return this.modifiers;
     }
 }

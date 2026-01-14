@@ -1,5 +1,6 @@
 package xyz.lilyflower.wavelength.client.gui;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import xyz.lilyflower.wavelength.inventory.ContainerPedestal;
@@ -9,6 +10,8 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
+import xyz.lilyflower.wavelength.util.PedestalRecipe;
+import xyz.lilyflower.wavelength.util.recipe.PedestalRecipeManager;
 
 public class GuiPedestal extends GuiContainer {
 
@@ -35,8 +38,12 @@ public class GuiPedestal extends GuiContainer {
                 entity.getInventoryName() :
                 I18n.format(entity.getInventoryName());
 
-        // TODO: draw the real ouput
-        this.drawStack(new ItemStack(Items.record_11), 127, 64);
+        ItemStack[] grid = new ItemStack[9];
+        System.arraycopy(this.entity.inventory, 0, grid, 0, 9);
+        PedestalRecipe recipe = PedestalRecipeManager.instance().find(this.entity, grid, Minecraft.getMinecraft().thePlayer);
+        if (recipe != null) {
+            this.drawStack(recipe.output(), 127, 64);
+        }
         this.fontRendererObj.drawString(name, 8, 34, 4210752);
         this.fontRendererObj.drawString(I18n.format("container.inventory"), 8, 128, 4210752);
     }
@@ -53,7 +60,7 @@ public class GuiPedestal extends GuiContainer {
     protected void drawGuiContainerBackgroundLayer(float partial, int mouseX, int mouseY) {
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 
-        ResourceLocation texture = TEXTURES[entity.tier().ordinal()];
+        ResourceLocation texture = TEXTURES[entity.tier.ordinal()];
         this.mc.getTextureManager().bindTexture(texture);
 
         int xPos = (width - xSize) / 2;

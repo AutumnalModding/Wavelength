@@ -4,19 +4,24 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
+import java.util.AbstractMap;
+import java.util.AbstractSet;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Set;
+import javax.annotation.Nonnull;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraftforge.oredict.OreDictionary;
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
 
-@ApiStatus.NonExtendable
 /// While other map types can be used, this one is optimized for performance with item/block pairs.
 /// It also has more clearly defined behavior for if we should fall back to looking for
 /// {@link OreDictionary#WILDCARD_VALUE} if we can't find the metadata that was passed in.
+@SuppressWarnings("unchecked")
 public class ObjMeta2ObjectOpenHashMap<Pair, K, V> implements Map<Pair, V> {
     /// The primary map backing this {@link Map} implementation, used to store and retrieve entries at a high speed.
     private final Map<K, Int2ObjectOpenHashMap<V>> backingMap = new Reference2ObjectOpenHashMap<>();
@@ -96,7 +101,7 @@ public class ObjMeta2ObjectOpenHashMap<Pair, K, V> implements Map<Pair, V> {
 
     @Override
     /// Only accepts {@link ObjMetaPair} instances. They do not have to be interned.
-    public @Nullable V put(Pair key, V value) {
+    public V put(Pair key, V value) {
         if(key instanceof ObjMetaPair<?> pair){
             return put((K) pair.get(), pair.getMeta(), value);
         }
@@ -132,7 +137,7 @@ public class ObjMeta2ObjectOpenHashMap<Pair, K, V> implements Map<Pair, V> {
     }
 
     @Override
-    public void putAll(@NotNull Map<? extends Pair, ? extends V> m) {
+    public void putAll(@Nonnull Map<? extends Pair, ? extends V> m) {
         m.forEach(this::put);
     }
 
@@ -143,9 +148,9 @@ public class ObjMeta2ObjectOpenHashMap<Pair, K, V> implements Map<Pair, V> {
     }
 
     @Override
-    public @NotNull Set<Pair> keySet() {
+    public @Nonnull Set<Pair> keySet() {
         return new AbstractSet<>() {
-            @Override
+            @Override @Nonnull
             public Iterator<Pair> iterator() {
                 return new ObjMetaKeyIterator(entrySet().iterator());
             }
@@ -158,9 +163,9 @@ public class ObjMeta2ObjectOpenHashMap<Pair, K, V> implements Map<Pair, V> {
     }
 
     @Override
-    public @NotNull Collection<V> values() {
+    public @Nonnull Collection<V> values() {
         return new AbstractSet<>() {
-            @Override
+            @Override @Nonnull
             public Iterator<V> iterator() {
                 return new ObjMetaValueIterator(entrySet().iterator());
             }
@@ -173,10 +178,10 @@ public class ObjMeta2ObjectOpenHashMap<Pair, K, V> implements Map<Pair, V> {
     }
 
     @Override
-    public @NotNull Set<Entry<Pair, V>> entrySet() {
+    public @Nonnull Set<Entry<Pair, V>> entrySet() {
         return new AbstractSet<>() {
             @Override
-            public @NotNull Iterator<Map.Entry<Pair, V>> iterator() {
+            public @Nonnull Iterator<Map.Entry<Pair, V>> iterator() {
                 return new ObjMetaEntryIterator();
             }
 
@@ -255,7 +260,6 @@ public class ObjMeta2ObjectOpenHashMap<Pair, K, V> implements Map<Pair, V> {
         private final Iterator<Map.Entry<K, Int2ObjectOpenHashMap<V>>> outerIterator = backingMap.entrySet().iterator();
         private Map.Entry<K, Int2ObjectOpenHashMap<V>> currentOuterEntry;
         private ObjectIterator<Int2ObjectMap.Entry<V>> innerIterator;
-        private Map.Entry<Integer, V> currentInnerEntry;
         private Map.Entry<Pair, V> nextEntry;
 
         @Override
@@ -265,7 +269,7 @@ public class ObjMeta2ObjectOpenHashMap<Pair, K, V> implements Map<Pair, V> {
             }
             while (outerIterator.hasNext() || (innerIterator != null && innerIterator.hasNext())) {
                 if (innerIterator != null && innerIterator.hasNext()) {
-                    currentInnerEntry = innerIterator.next();
+                    Entry<Integer, V> currentInnerEntry = innerIterator.next();
                     nextEntry = new AbstractMap.SimpleEntry<>(internPair(currentOuterEntry.getKey(), currentInnerEntry.getKey()), currentInnerEntry.getValue());
                     return true;
                 }

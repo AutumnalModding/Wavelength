@@ -19,6 +19,12 @@ import xyz.lilyflower.wavelength.redist.BlockPos;
 import xyz.lilyflower.wavelength.redist.DoublePerlinNoiseSampler;
 
 public class WorldGenGeode extends WorldGenerator {
+    public enum Type {
+        TOPAZ,
+        CITRINE,
+        AMETHYST
+    }
+
 	private final int minGenOffset, maxGenOffset;//geodeFeatureConfig.minGenOffset geodeFeatureConfig.maxGenOffset
 	private final int threshold;//geodeFeatureConfig.invalidBlocksThreshold
 	private final int[] distribution;//geodeFeatureConfig.distributionPoints
@@ -37,41 +43,47 @@ public class WorldGenGeode extends WorldGenerator {
 	private final List<Block> buds;
 	private final Block inner;
 	private final Block budding;
+    public final Type type;
 
-	public WorldGenGeode(BlockMetaPair outer, BlockMetaPair middle, Block inner, Block budding, Block bud1, Block bud2) {
+	public WorldGenGeode(BlockMetaPair outer, BlockMetaPair middle, Block inner, Block budding, Block bud1, Block bud2, Type type) {
 		this(-16, 16, 1, new int[]{3, 4}, new int[]{4, 5, 6}, 1.7D, 2.2D, 3.2D, 4.2D, new int[]{1, 2}, 0.95D, 2.0D, 2, 0.05D, 0.083D, 0.35D,
-				outer, middle, inner, budding, bud1, bud2);
+				outer, middle, inner, budding, bud1, bud2, type);
 	}
 
 //	public WorldGenGeode(BlockMetaPair outer, BlockMetaPair middleBlock) {
 //		this(outer, middleBlock, ModBlocks.AMETHYST_BLOCK.get(), ModBlocks.BUDDING_AMETHYST.get(), ModBlocks.AMETHYST_CLUSTER_1.get(), ModBlocks.AMETHYST_CLUSTER_2.get());
 //	}
 
-	private WorldGenGeode(int minOffset, int maxOffset, int threshold, int[] distribution, int[] outerWallDist, double fill, double inner, double middle, double outer, int[] pointOff, double crackChance, double baseCrack, int crackPointOff, double noiseAmp, double budChance, double potentialPlaceChance,
-						  BlockMetaPair outerBlock, BlockMetaPair middleBlock, Block innerBlock, Block innerBuddingBlock, Block bud1, Block bud2) {
+	private WorldGenGeode(
+            int minOffset, int maxOffset, int threshold, int[] distribution,
+            int[] outerWallDist, double fill, double inner, double middle,
+            double outer, int[] pointOff, double crackChance, double baseCrack,
+            int crackPointOff, double noiseAmp, double budChance, double potentialPlaceChance,
+            BlockMetaPair outerBlock, BlockMetaPair middleBlock, Block innerBlock,
+            Block innerBuddingBlock, Block bud1, Block bud2, Type type
+    ) {
 		this.outer = outerBlock;
 		this.middle = middleBlock;
 		this.inner = innerBlock;
 		this.budding = innerBuddingBlock;
-
-		buds = ImmutableList.of(bud1, bud2);
-
-		minGenOffset = minOffset;
-		maxGenOffset = maxOffset;
+        this.buds = ImmutableList.of(bud1, bud2);
+        this.minGenOffset = minOffset;
+        this.maxGenOffset = maxOffset;
 		this.threshold = threshold;
 		this.distribution = distribution;
-		outerWallDistance = outerWallDist;
+        this.outerWallDistance = outerWallDist;
 		this.fill = fill;
-		innerLayer = inner;
-		middleLayer = middle;
-		outerLayer = outer;
-		offset = pointOff;
-		generateCrackChance = crackChance;
-		baseCrackSize = baseCrack;
-		crackPointOffset = crackPointOff;
-		noise = noiseAmp;
-		buddingAmethystChance = budChance;
-		usePotentialPlacementsChance = potentialPlaceChance;
+        this.innerLayer = inner;
+        this.middleLayer = middle;
+        this.outerLayer = outer;
+        this.offset = pointOff;
+        this.generateCrackChance = crackChance;
+        this.baseCrackSize = baseCrack;
+        this.crackPointOffset = crackPointOff;
+        this.noise = noiseAmp;
+        this.buddingAmethystChance = budChance;
+		this.usePotentialPlacementsChance = potentialPlaceChance;
+        this.type = type;
 	}
 
 	/**

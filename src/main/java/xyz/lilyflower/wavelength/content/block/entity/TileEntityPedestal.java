@@ -1,5 +1,11 @@
 package xyz.lilyflower.wavelength.content.block.entity;
 
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTTagInt;
 import xyz.lilyflower.wavelength.util.PastelType;
 import xyz.lilyflower.wavelength.util.PedestalRecipe;
 import net.minecraft.entity.player.EntityPlayer;
@@ -42,23 +48,15 @@ public class TileEntityPedestal extends TileEntity implements ISidedInventory {
         }
     }
 
-    private static final int[] positions = new int[]{
-            0, // first slot
-            9, // grid size
-            9, // tablet slot
-            10 // powders start
-    };
-
-    private ItemStack[] inventory;
-    private PedestalTier tier;
-    private String name;
-
+    public ItemStack[] inventory;
+    public PedestalTier tier;
+    public String name;
     private final Map<PastelType, Integer> catalysts;
 
-    private boolean active;
-    private int progress;
+    public boolean active;
+    public int progress;
     private PedestalRecipe recipe;
-    private EntityPlayerMP player;
+    public EntityPlayerMP player;
 
     @SuppressWarnings("unused")
     public TileEntityPedestal() {
@@ -69,21 +67,11 @@ public class TileEntityPedestal extends TileEntity implements ISidedInventory {
         this.tier = tier;
         this.inventory = new ItemStack[tier.size()];
         this.catalysts = new HashMap<>();
-        this.initialize();
         this.active = false;
         this.progress = 0;
-    }
-
-    private void initialize() {
         for (PastelType type : PastelType.values()) {
             this.catalysts.put(type, 0);
         }
-    }
-
-    public PedestalRecipe recipe() { return this.recipe; }
-
-    public PedestalTier tier() {
-        return this.tier;
     }
 
     public void setTier(PedestalTier tier) {
@@ -109,32 +97,21 @@ public class TileEntityPedestal extends TileEntity implements ISidedInventory {
             return;
         }
 
-        this.recipe = recipe;
-        this.player = player;
-        this.active = true;
-        this.progress = 0;
-        markDirty();
-    }
+        boolean valid = this.consume(recipe);
+        valid |= this.decatalyze(recipe);
 
-    public boolean active() {
-        return this.active;
-    }
-
-    public int progress() {
-        return this.progress;
-    }
-
-    public int time() {
-        return this.recipe != null ? this.recipe.time() : 0;
-    }
-
-    public Map<PastelType, Integer> catalysts() {
-        return new HashMap<>(this.catalysts);
+        if (valid) {
+            this.recipe = recipe;
+            this.player = player;
+            this.active = true;
+            this.progress = 0;
+            this.markDirty();
+        }
     }
 
     public void add(PastelType type, int amount) {
         this.catalysts.put(type, this.catalysts.getOrDefault(type, 0) + amount);
-        markDirty();
+        this.markDirty();
     }
 
     public boolean subtract(PastelType type, int amount) {
@@ -144,6 +121,7 @@ public class TileEntityPedestal extends TileEntity implements ISidedInventory {
             this.markDirty();
             return true;
         }
+
         return false;
     }
 
@@ -165,8 +143,8 @@ public class TileEntityPedestal extends TileEntity implements ISidedInventory {
     }
 
     private PedestalRecipe find(EntityPlayerMP player) {
-        ItemStack[] grid = new ItemStack[positions[1]];
-        System.arraycopy(inventory, positions[0], grid, 0, positions[1]);
+        ItemStack[] grid = new ItemStack[9];
+        System.arraycopy(inventory, 0, grid, 0, 9);
 
         return PedestalRecipeManager.instance().find(this, grid, player);
     }
@@ -186,42 +164,52 @@ public class TileEntityPedestal extends TileEntity implements ISidedInventory {
             return;
         }
 
-        this.consume();
-        this.consume(recipe);
+        ItemStack output = this.recipe.output().copy();
+        this.spawn(output);
+        this.recipe.completion().accept(this);
+    }
 
-        if (this.inventory[positions[2]] != null) {
-            if (this.inventory[positions[2]].isItemStackDamageable()) {
-                this.inventory[positions[2]].setItemDamage(this.inventory[positions[2]].getItemDamage() + 1);
+    private boolean consume(PedestalRecipe recipe) {
+        boolean valid = true;
+        ItemStack[] old = new ItemStack[9];
+        System.arraycopy(this.inventory, 0, old, 0, 9);
+        List<ItemStack> input = recipe.input();
+        for (int index = 0; index < input.size(); index++) {
+            ItemStack required = input.get(index);
+            ItemStack there = this.inventory[index];
+            if (there != null && there.getItem() == required.getItem() && there.stackSize >= required.stackSize) {
+                there.stackSize -= required.stackSize;
 
-                if (this.inventory[positions[2]].getItemDamage() >= this.inventory[positions[2]].getMaxDamage()) {
-                    this.inventory[positions[2]] = null;
+                if (there.stackSize <= 0) {
+                    there = null;
                 }
-            }
+
+                this.inventory[index] = there;
+            } else valid = false;
         }
 
-        output(this.recipe.output().copy());
+        if (!valid) System.arraycopy(old, 0, this.inventory, 0, 0);
+        return valid;
     }
 
-    private void consume() {
-        for (int index = 0; index < this.recipe.input().size(); index++) {
-            ItemStack required = this.recipe.input().get(index);
-            if (required != null && this.inventory[positions[0] + index] != null) {
-                this.inventory[positions[0] + index].stackSize -= required.stackSize;
+    private boolean decatalyze(PedestalRecipe recipe) {
+        Map<PastelType, Integer> old = new HashMap<>(this.catalysts);
+        AtomicBoolean valid = new AtomicBoolean(true);
+        recipe.catalysts().forEach((type, amount) -> {
+            boolean available = this.subtract(type, amount);
+            if (!available) valid.set(false);
+        });
 
-                if (this.inventory[positions[0] + index].stackSize <= 0) {
-                    this.inventory[positions[0] + index] = null;
-                }
-            }
+        if (!valid.get()) {
+            this.catalysts.clear();
+            this.catalysts.putAll(old);
+            return false;
         }
+
+        return true;
     }
 
-    private void consume(PedestalRecipe recipe) {
-        for (Map.Entry<PastelType, Integer> entry : recipe.catalysts().entrySet()) {
-            subtract(entry.getKey(), entry.getValue());
-        }
-    }
-
-    private void output(ItemStack stack) {
+    private void spawn(ItemStack stack) {
         if (stack == null || this.worldObj.isRemote) {
             return;
         }
@@ -230,19 +218,13 @@ public class TileEntityPedestal extends TileEntity implements ISidedInventory {
         double spawnY = this.yCoord + 1.5D;
         double spawnZ = this.zCoord + 0.5D;
 
-        net.minecraft.entity.item.EntityItem item =
-                new net.minecraft.entity.item.EntityItem(this.worldObj, spawnX, spawnY, spawnZ, stack);
+        EntityItem item = new EntityItem(this.worldObj, spawnX, spawnY, spawnZ, stack);
 
         item.motionX = 0;
         item.motionY = 0.1D;
         item.motionZ = 0;
 
         this.worldObj.spawnEntityInWorld(item);
-    }
-
-    @Override
-    public int getSizeInventory() {
-        return this.inventory.length;
     }
 
     @Override
@@ -300,41 +282,14 @@ public class TileEntityPedestal extends TileEntity implements ISidedInventory {
         markDirty();
     }
 
-    @Override
-    public String getInventoryName() {
-        return hasCustomInventoryName() ? this.name : "container.pedestal_" + this.tier.name().toLowerCase();
-    }
 
-    @Override
-    public boolean hasCustomInventoryName() {
-        return this.name != null && !this.name.isEmpty();
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public int getInventoryStackLimit() {
-        return 64;
-    }
 
     @Override
     public boolean isUseableByPlayer(EntityPlayer player) {
         return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) == this &&
-                player.getDistanceSq(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D) <= 64.0D;
+        player.getDistanceSq(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D) <= 64.0D;
     }
 
-    @Override
-    public void openInventory() {}
-
-    @Override
-    public void closeInventory() {}
-
-    @Override
-    public boolean isItemValidForSlot(int slot, ItemStack stack) {
-        return true;
-    }
 
     @Override
     public int[] getAccessibleSlotsFromSide(int side) {
@@ -345,24 +300,14 @@ public class TileEntityPedestal extends TileEntity implements ISidedInventory {
         return slots;
     }
 
-    @Override
-    public boolean canInsertItem(int slot, ItemStack stack, int side) {
-        return isItemValidForSlot(slot, stack);
-    }
 
     @Override
-    public boolean canExtractItem(int slot, ItemStack stack, int side) {
-        return true;
-    }
-
-    @Override
+    @SuppressWarnings("unchecked")
     public void readFromNBT(NBTTagCompound compound) {
         super.readFromNBT(compound);
-
-        int tier = compound.getInteger("Tier");
-        this.tier = PedestalTier.from(tier);
-
+        this.tier = PedestalTier.from(compound.getInteger("Tier"));
         this.inventory = new ItemStack[this.tier.size()];
+        if (compound.hasKey("CustomName", 8)) { this.name = compound.getString("CustomName"); }
 
         NBTTagList tagList = compound.getTagList("Items", 10);
         for (int i = 0; i < tagList.tagCount(); i++) {
@@ -374,18 +319,20 @@ public class TileEntityPedestal extends TileEntity implements ISidedInventory {
             }
         }
 
-        if (compound.hasKey("CustomName", 8)) {
-            this.name = compound.getString("CustomName");
-        }
 
-        initialize();
         if (compound.hasKey("Catalysts", 10)) {
-            NBTTagCompound catalysts = compound.getCompoundTag("Catalysts");
-            for (PastelType type : PastelType.values()) {
-                if (catalysts.hasKey(type.name())) {
-                    this.catalysts.put(type, catalysts.getInteger(type.name()));
-                }
-            }
+            try {
+                Class<?> clazz = compound.getClass();
+                Field tags = clazz.getDeclaredField("tagMap");
+                Map<String, NBTBase> map = (Map<String, NBTBase>) tags.get(compound);
+                map.forEach((key, value) -> {
+                    PastelType type = PastelType.valueOf(key.toUpperCase());
+                    if (value instanceof NBTTagInt integer) {
+                        int amount = integer.func_150287_d();
+                        this.catalysts.put(type, amount);
+                    }
+                });
+            } catch (ReflectiveOperationException ignored) {}
         }
 
         this.active = compound.getBoolean("IsCrafting");
@@ -395,8 +342,10 @@ public class TileEntityPedestal extends TileEntity implements ISidedInventory {
     @Override
     public void writeToNBT(NBTTagCompound compound) {
         super.writeToNBT(compound);
-
         compound.setInteger("Tier", this.tier.ordinal());
+        compound.setBoolean("IsCrafting", this.active);
+        compound.setInteger("CraftingProgress", this.progress);
+        if (this.name != null && !this.name.isEmpty()) compound.setString("CustomName", this.name);
 
         NBTTagList list = new NBTTagList();
         for (int i = 0; i < this.inventory.length; i++) {
@@ -409,18 +358,10 @@ public class TileEntityPedestal extends TileEntity implements ISidedInventory {
         }
         compound.setTag("Items", list);
 
-        if (hasCustomInventoryName()) {
-            compound.setString("CustomName", this.name);
-        }
 
         NBTTagCompound catalysts = new NBTTagCompound();
-        for (Map.Entry<PastelType, Integer> entry : this.catalysts.entrySet()) {
-            catalysts.setInteger(entry.getKey().name(), entry.getValue());
-        }
+        this.catalysts.forEach((type, amount) -> catalysts.setInteger(type.name(), amount));
         compound.setTag("Catalysts", catalysts);
-
-        compound.setBoolean("IsCrafting", this.active);
-        compound.setInteger("CraftingProgress", this.progress);
     }
 
     @Override
@@ -430,8 +371,14 @@ public class TileEntityPedestal extends TileEntity implements ISidedInventory {
         return new S35PacketUpdateTileEntity(this.xCoord, this.yCoord, this.zCoord, 1, nbtTag);
     }
 
-    @Override
-    public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) {
-        readFromNBT(packet.func_148857_g());
-    }
+    @Override public void openInventory() {}
+    @Override public void closeInventory() {}
+    @Override public int getInventoryStackLimit() { return 64; }
+    @Override public int getSizeInventory() { return this.inventory.length; }
+    @Override public boolean isItemValidForSlot(int slot, ItemStack stack) { return true; }
+    @Override public boolean canExtractItem(int slot, ItemStack stack, int side) { return true; }
+    @Override public boolean hasCustomInventoryName() { return this.name != null && !this.name.isEmpty(); }
+    @Override public boolean canInsertItem(int slot, ItemStack stack, int side) { return isItemValidForSlot(slot, stack); }
+    @Override public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) { readFromNBT(packet.func_148857_g()); }
+    @Override public String getInventoryName() { return hasCustomInventoryName() ? this.name : "container.pedestal_" + this.tier.name().toLowerCase(); }
 }

@@ -67,7 +67,7 @@ public class BlockPedestal extends BlockContainer {
             TileEntity entity = world.getTileEntity(x, y, z);
 
             if (entity instanceof TileEntityPedestal pedestal) {
-                pedestal.setName(stack.getDisplayName());
+                pedestal.name = stack.getDisplayName();
             }
         }
 

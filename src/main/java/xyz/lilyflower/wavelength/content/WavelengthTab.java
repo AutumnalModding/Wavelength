@@ -32,5 +32,5 @@ public class WavelengthTab extends CreativeTabs {
     }
 
     public static final WavelengthTab BLOCKS = new WavelengthTab("wavelength_blocks", Item.getItemFromBlock(Blocks.stone));
-    public static final WavelengthTab MATERIALS = new WavelengthTab("wavelength_materials", Items.iron_ingot);
+    public static final WavelengthTab RESOURCES = new WavelengthTab("wavelength_materials", Items.iron_ingot);
 }

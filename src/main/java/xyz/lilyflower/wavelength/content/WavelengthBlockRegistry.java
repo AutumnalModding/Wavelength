@@ -17,15 +17,17 @@ import xyz.lilyflower.wavelength.content.block.entity.TileEntityPedestal;
 import xyz.lilyflower.wavelength.content.block.gem.BlockAmethyst;
 import xyz.lilyflower.wavelength.content.block.gem.BlockBudding;
 import xyz.lilyflower.wavelength.content.block.gem.BlockCluster;
-import xyz.lilyflower.wavelength.content.block.generic.BlockGeneric;
-import xyz.lilyflower.wavelength.content.block.generic.BlockGravity;
-import xyz.lilyflower.wavelength.content.block.generic.BlockSided;
-import xyz.lilyflower.wavelength.content.block.generic.BlockGenericOre;
-import xyz.lilyflower.wavelength.content.block.generic.BlockGenericPlank;
+import xyz.lilyflower.wavelength.content.block.basic.BlockBasic;
+import xyz.lilyflower.wavelength.content.block.gravity.BlockGravity;
+import xyz.lilyflower.wavelength.content.block.BlockSided;
+import xyz.lilyflower.wavelength.content.block.basic.BasicOre;
+import xyz.lilyflower.wavelength.content.block.basic.BasicPlank;
 
 @SuppressWarnings("unused")
 public class WavelengthBlockRegistry implements ContentRegistry<Block> {
+    private static final Class<?>[] SIDED = new Class<?>[]{String.class, Material.class};
     private static final Class<?>[] PEDESTAL = new Class<?>[]{TileEntityPedestal.PedestalTier.class};
+    private static final Class<?>[] GRAVITY = new Class<?>[]{Material.class, EnumFacing.class, float.class};
 
     private static final String[] woods = new String[]{
             "weeping_gala",
@@ -57,8 +59,6 @@ public class WavelengthBlockRegistry implements ContentRegistry<Block> {
     private static final String[] ores = new String[]{
             "malachite",
             "azurite",
-            "paltaeria",
-            "stratine",
     };
 
     static final ArrayList<SolarisExtensions.Pair<Block, String>> BLOCKS = new ArrayList<>();
@@ -104,14 +104,14 @@ public class WavelengthBlockRegistry implements ContentRegistry<Block> {
         ContentRegistry.create("pedestal_onyx", BlockPedestal.class, PEDESTAL, BLOCKS, TileEntityPedestal.PedestalTier.ONYX);
         ContentRegistry.create("pedestal_moonstone", BlockPedestal.class, PEDESTAL, BLOCKS, TileEntityPedestal.PedestalTier.MOONSTONE);
 
-        CALCITE_POLISHED = ContentRegistry.create("calcite_polished", BlockGeneric.class, new Class<?>[]{Material.class}, BLOCKS, Material.rock);
-        BASALT_POLISHED = ContentRegistry.create("basalt_polished", BlockGeneric.class, new Class<?>[]{Material.class}, BLOCKS, Material.rock);
-        ContentRegistry.create("floatblock_stratine", BlockGravity.class, new Class<?>[]{Material.class, EnumFacing.class, boolean.class}, BLOCKS, Material.rock, EnumFacing.DOWN, false);
-        ContentRegistry.create("floatblock_paltaeria", BlockGravity.class, new Class<?>[]{Material.class, EnumFacing.class, boolean.class}, BLOCKS, Material.rock, EnumFacing.UP, false);
-        for (String gem : gems) ContentRegistry.create(gem + "_polished", BlockGeneric.class, new Class<?>[]{Material.class}, BLOCKS, Material.rock);
-        for (String gem : gems) ContentRegistry.create(gem + "_block", BlockAmethyst.class, new Class<?>[]{}, BLOCKS);
-        CALCITE = ContentRegistry.create("calcite", BlockGeneric.class, new Class<?>[]{Material.class}, BLOCKS, Material.rock);
-        BASALT = ContentRegistry.create("basalt", BlockSided.class, new Class<?>[]{String.class, Material.class}, BLOCKS, "basalt", Material.rock);
+        CALCITE_POLISHED = ContentRegistry.create("calcite_polished", BlockBasic.class, new Class<?>[]{Material.class}, BLOCKS, Material.rock);
+        BASALT_POLISHED = ContentRegistry.create("basalt_polished", BlockBasic.class, new Class<?>[]{Material.class}, BLOCKS, Material.rock);
+        ContentRegistry.create("floatblock_stratine", BlockGravity.class, GRAVITY, BLOCKS, Material.rock, EnumFacing.DOWN,1F);
+        ContentRegistry.create("floatblock_paltaeria", BlockGravity.class, GRAVITY, BLOCKS, Material.rock, EnumFacing.UP, 1F);
+        for (String gem : gems) ContentRegistry.create(gem + "_polished", BlockBasic.class, new Class<?>[]{Material.class}, BLOCKS, Material.rock);
+        for (String gem : gems) ContentRegistry.create(gem + "_block", BlockAmethyst.class, ContentRegistry.EMPTY, BLOCKS);
+        CALCITE = ContentRegistry.create("calcite", BlockBasic.class, new Class<?>[]{Material.class}, BLOCKS, Material.rock);
+        BASALT = ContentRegistry.create("basalt", BlockSided.class, SIDED, BLOCKS, "basalt", Material.rock);
 
         Item[] shards = new Item[gems.length];
         for (int index = 0; index < gems.length; index++) {
@@ -140,23 +140,29 @@ public class WavelengthBlockRegistry implements ContentRegistry<Block> {
         for (int index = 0; index < shards.length; index++) {
             Item shard = shards[index];
             String gem = gems[index];
-            BlockGenericOre ore = new BlockGenericOre().drops(shard);
+            BasicOre ore = new BasicOre().drops(shard);
             BLOCKS.add(new SolarisExtensions.Pair<>(ore, gem + "_ore"));
         }
 
-        ((BlockGenericOre) ContentRegistry.create("ore_shimmerstone", BlockGenericOre.class, new Class<?>[]{}, BLOCKS)).drops(WavelengthItemRegistry.GEM_SHIMMERSTONE);
+        ((BasicOre) ContentRegistry.create("ore_shimmerstone", BasicOre.class, ContentRegistry.EMPTY, BLOCKS)).drops(WavelengthItemRegistry.GEM_SHIMMERSTONE);
         for (String ore : ores) {
             try {
                 Class<WavelengthItemRegistry> clazz = WavelengthItemRegistry.class;
                 Field field = clazz.getField("RAW_" + ore.toUpperCase());
                 Item raw = (Item) field.get(null);
-                BlockGenericOre block = new BlockGenericOre().drops(raw);
+                BasicOre block = new BasicOre().drops(raw);
                 BLOCKS.add(new SolarisExtensions.Pair<>(block, "ore_" + ore));
             } catch (ReflectiveOperationException ignored) {}
         }
-        
-        ContentRegistry.create("log_spirit_sallow", BlockSided.class, new Class<?>[]{String.class, Material.class}, BLOCKS, "spirit_sallow_log", Material.wood);
-        for (String wood : woods) ContentRegistry.create("log_" + wood, BlockSided.class, new Class<?>[]{String.class, Material.class}, BLOCKS, wood + "_log", Material.wood);
-        for (String wood : woods) ContentRegistry.create("plank_" + wood, BlockGenericPlank.class, new Class<?>[]{String.class}, BLOCKS, wood + "_planks");
+
+        Block stratines = new BlockGravity(Material.rock,EnumFacing.DOWN,0.05F).setCreativeTab(WavelengthTab.RESOURCES);
+        Block paltaeria = new BlockGravity(Material.rock, EnumFacing.UP, 0.05F).setCreativeTab(WavelengthTab.RESOURCES);
+
+        BLOCKS.add(new SolarisExtensions.Pair<>(paltaeria, "orePaltaeria"));
+        BLOCKS.add(new SolarisExtensions.Pair<>(stratines, "ore_stratine"));
+
+        ContentRegistry.create("log_spirit_sallow", BlockSided.class, SIDED, BLOCKS, "spirit_sallow_log", Material.wood);
+        for (String wood : woods) ContentRegistry.create("log_" + wood, BlockSided.class, SIDED, BLOCKS, wood + "_log", Material.wood);
+        for (String wood : woods) ContentRegistry.create("plank_" + wood, BasicPlank.class, new Class<?>[]{String.class}, BLOCKS, wood + "_planks");
     }
 }

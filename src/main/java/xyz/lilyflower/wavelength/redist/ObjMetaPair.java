@@ -5,12 +5,10 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 import org.apache.commons.lang3.tuple.Pair;
-import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Set;
 
 /// Used as an easy way to make a container object for comparing block/item and meta instances.
-@ApiStatus.NonExtendable
 public class ObjMetaPair<BlockOrItem> extends Pair<BlockOrItem, Integer> implements IReferenceBase<BlockOrItem>, ITaggable {
     private final BlockOrItem object;
     private final transient int meta;

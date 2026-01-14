@@ -18,7 +18,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
-import xyz.lilyflower.wavelength.content.block.generic.BlockGravity;
+import xyz.lilyflower.wavelength.content.block.gravity.BlockGravity;
 
 public class EntityGravityBlock extends Entity implements IEntityAdditionalSpawnData {
     public Block block;
@@ -53,12 +53,8 @@ public class EntityGravityBlock extends Entity implements IEntityAdditionalSpawn
         this.setSize(0.98F, 0.98F);
         this.yOffset = this.height / 2.0F;
         this.setPosition(x, y, z);
-        this.motionX = 0.0D;
-        this.motionY = 0.0D;
-        this.motionZ = 0.0D;
-        this.prevPosX = x;
-        this.prevPosY = y;
-        this.prevPosZ = z;
+        this.motionX = 0.0D; this.motionY = 0.0D; this.motionZ = 0.0D;
+        this.prevPosX = x; this.prevPosY = y; this.prevPosZ = z;
     }
 
     @Override
@@ -83,15 +79,16 @@ public class EntityGravityBlock extends Entity implements IEntityAdditionalSpawn
         ++this.age;
         this.prevPosX = this.posX; this.prevPosY = this.posY; this.prevPosZ = this.posZ;
         switch (this.direction) {
-            case DOWN -> this.motionY -= 0.05D;
-            case UP -> this.motionY += 0.05D;
-            case NORTH -> this.motionZ += 0.05D;
-            case SOUTH -> this.motionZ -= 0.05D;
-            case EAST -> this.motionX += 0.05D;
-            case WEST -> this.motionX -= 0.05D;
+            case DOWN -> this.motionY -= 0.03D;
+            case UP -> this.motionY += 0.03D;
+            case NORTH -> this.motionZ += 0.03D;
+            case SOUTH -> this.motionZ -= 0.03D;
+            case EAST -> this.motionX += 0.03D;
+            case WEST -> this.motionX -= 0.03D;
         }
+
         this.moveEntity(this.motionX, this.motionY, this.motionZ);
-        this.motionX *= 0.95D; this.motionY *= 0.95D; this.motionZ *= 0.95D;
+        this.motionX *= 0.7D; this.motionY *= 0.7D; this.motionZ *= 0.7D;
 
         if (!this.worldObj.isRemote) {
             int x = MathHelper.floor_double(this.posX); int y = MathHelper.floor_double(this.posY); int z = MathHelper.floor_double(this.posZ);

@@ -19,15 +19,11 @@ public class SimplexNoiseSampler {
 		this.originY = random.nextDouble() * 256.0D;
 		this.originZ = random.nextDouble() * 256.0D;
 
-		int j;
-		for (j = 0; j < 256; this.permutations[j] = j++) {
-		}
-
-		for (j = 0; j < 256; ++j) {
-			int k = random.nextInt(256 - j);
-			int l = this.permutations[j];
-			this.permutations[j] = this.permutations[k + j];
-			this.permutations[k + j] = l;
+		for (int index = 0; index < 256; ++index) {
+			int offset = random.nextInt(256 - index);
+			int permutation = this.permutations[index];
+			this.permutations[index] = this.permutations[offset + index];
+			this.permutations[offset + index] = permutation;
 		}
 
 	}

@@ -30,7 +30,19 @@ public class WavelengthWorldgen implements IWorldGenerator {
         };
 
         if (geode != null) { // TODO: proper topaz/citrine heights
-            geode.generate(world, random, x, MathHelper.getRandomIntegerInRange(random, 5, 39), z);
+            int minimum = switch (geode.type) {
+                case TOPAZ -> 75;
+                case CITRINE -> 30;
+                case AMETHYST -> 5;
+            };
+
+            int maximum = switch (geode.type) {
+                case TOPAZ -> 255;
+                case CITRINE -> 60;
+                case AMETHYST -> 39;
+            };
+
+            geode.generate(world, random, x, MathHelper.getRandomIntegerInRange(random, minimum, maximum), z);
         }
     }
 
@@ -45,7 +57,8 @@ public class WavelengthWorldgen implements IWorldGenerator {
                 (Block) Block.blockRegistry.getObject("wavelength:topaz_block"),
                 (Block) Block.blockRegistry.getObject("wavelength:topaz_budding"),
                 (Block) Block.blockRegistry.getObject("wavelength:topaz_bud_medium"),
-                (Block) Block.blockRegistry.getObject("wavelength:topaz_cluster")
+                (Block) Block.blockRegistry.getObject("wavelength:topaz_cluster"),
+                WorldGenGeode.Type.TOPAZ
         );
 
         GEODE_CITRINE = new WorldGenGeode(
@@ -54,7 +67,8 @@ public class WavelengthWorldgen implements IWorldGenerator {
                 (Block) Block.blockRegistry.getObject("wavelength:citrine_block"),
                 (Block) Block.blockRegistry.getObject("wavelength:citrine_budding"),
                 (Block) Block.blockRegistry.getObject("wavelength:citrine_bud_medium"),
-                (Block) Block.blockRegistry.getObject("wavelength:citrine_cluster")
+                (Block) Block.blockRegistry.getObject("wavelength:citrine_cluster"),
+                WorldGenGeode.Type.CITRINE
         );
 
         GEODE_AMETHYST = new WorldGenGeode(
@@ -63,7 +77,8 @@ public class WavelengthWorldgen implements IWorldGenerator {
                 (Block) Block.blockRegistry.getObject("wavelength:amethyst_block"),
                 (Block) Block.blockRegistry.getObject("wavelength:amethyst_budding"),
                 (Block) Block.blockRegistry.getObject("wavelength:amethyst_bud_medium"),
-                (Block) Block.blockRegistry.getObject("wavelength:amethyst_cluster")
+                (Block) Block.blockRegistry.getObject("wavelength:amethyst_cluster"),
+                WorldGenGeode.Type.AMETHYST
         );
     }
 }
