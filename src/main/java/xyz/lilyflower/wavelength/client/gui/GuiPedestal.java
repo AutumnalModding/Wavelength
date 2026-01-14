@@ -1,7 +1,7 @@
 package xyz.lilyflower.wavelength.client.gui;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.init.Items;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import xyz.lilyflower.wavelength.inventory.ContainerPedestal;
 import xyz.lilyflower.wavelength.content.block.entity.TileEntityPedestal;
@@ -38,22 +38,22 @@ public class GuiPedestal extends GuiContainer {
                 entity.getInventoryName() :
                 I18n.format(entity.getInventoryName());
 
+        EntityPlayer player = Minecraft.getMinecraft().thePlayer;
         ItemStack[] grid = new ItemStack[9];
         System.arraycopy(this.entity.inventory, 0, grid, 0, 9);
-        PedestalRecipe recipe = PedestalRecipeManager.instance().find(this.entity, grid, Minecraft.getMinecraft().thePlayer);
+        PedestalRecipe recipe = PedestalRecipeManager.instance().find(this.entity, grid, player);
         if (recipe != null) {
-            this.drawStack(recipe.output(), 127, 64);
+            ItemStack output = recipe.output().apply(this.entity, player);
+            float level = itemRender.zLevel;
+            GL11.glEnable(GL11.GL_DEPTH_TEST);
+            itemRender.zLevel = 100.0F;
+            itemRender.renderItemAndEffectIntoGUI(this.fontRendererObj, this.mc.getTextureManager(), output, 127, 64);
+            itemRender.renderItemOverlayIntoGUI(this.fontRendererObj, this.mc.getTextureManager(), output, 127, 64, null);
+            itemRender.zLevel = level;
+            GL11.glDisable(GL11.GL_DEPTH_TEST);
         }
         this.fontRendererObj.drawString(name, 8, 34, 4210752);
         this.fontRendererObj.drawString(I18n.format("container.inventory"), 8, 128, 4210752);
-    }
-
-    private void drawStack(ItemStack stack, int x, int y) {
-        GL11.glEnable(GL11.GL_DEPTH_TEST);
-        itemRender.zLevel = 100.0F;
-        itemRender.renderItemAndEffectIntoGUI(this.fontRendererObj, this.mc.getTextureManager(), stack, x, y);
-        itemRender.renderItemOverlayIntoGUI(this.fontRendererObj, this.mc.getTextureManager(), stack, x, y, null);
-        itemRender.zLevel = 0.0F;
     }
 
     @Override

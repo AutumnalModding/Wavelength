@@ -93,12 +93,13 @@ public class TileEntityPedestal extends TileEntity implements ISidedInventory {
         }
 
         PedestalRecipe recipe = find(player);
-        if (recipe == null || !valid(recipe)) {
+        if (recipe == null) {
             return;
         }
 
-        boolean valid = this.consume(recipe);
-        valid |= this.decatalyze(recipe);
+        boolean valid = this.valid(recipe, player);
+        valid |= this.consume(recipe);
+        valid |= this.decatalyze(recipe, player);
 
         if (valid) {
             this.recipe = recipe;
@@ -144,29 +145,27 @@ public class TileEntityPedestal extends TileEntity implements ISidedInventory {
 
     private PedestalRecipe find(EntityPlayerMP player) {
         ItemStack[] grid = new ItemStack[9];
-        System.arraycopy(inventory, 0, grid, 0, 9);
-
+        System.arraycopy(this.inventory, 0, grid, 0, 9);
         return PedestalRecipeManager.instance().find(this, grid, player);
     }
 
-    private boolean valid(PedestalRecipe recipe) {
-        for (Map.Entry<PastelType, Integer> required : recipe.catalysts().entrySet()) {
-            int available = this.catalysts.getOrDefault(required.getKey(), 0);
-            if (available < required.getValue()) {
-                return false;
+    private boolean valid(PedestalRecipe recipe, EntityPlayer player) {
+        AtomicBoolean valid = new AtomicBoolean(true);
+        Map<PastelType, Integer> catalysts = recipe.catalysts().apply(this, player);
+        catalysts.forEach((type, amount) -> {
+            int available = this.catalysts.getOrDefault(type, 0);
+            if (available < amount) {
+                valid.set(false);
             }
-        }
-        return true;
+        });
+
+        return valid.get();
     }
 
     private void complete() {
-        if (this.recipe == null) {
-            return;
-        }
-
-        ItemStack output = this.recipe.output().copy();
-        this.spawn(output);
-        this.recipe.completion().accept(this);
+        if (this.recipe == null) return;
+        ItemStack output = this.recipe.output().apply(this, this.player); EntityItem item = this.spawn(output);
+        if (this.recipe.completion().apply(this, item)) this.worldObj.spawnEntityInWorld(item);
     }
 
     private boolean consume(PedestalRecipe recipe) {
@@ -192,10 +191,11 @@ public class TileEntityPedestal extends TileEntity implements ISidedInventory {
         return valid;
     }
 
-    private boolean decatalyze(PedestalRecipe recipe) {
+    private boolean decatalyze(PedestalRecipe recipe, EntityPlayer player) {
         Map<PastelType, Integer> old = new HashMap<>(this.catalysts);
         AtomicBoolean valid = new AtomicBoolean(true);
-        recipe.catalysts().forEach((type, amount) -> {
+        Map<PastelType, Integer> catalysts = recipe.catalysts().apply(this, player);
+        catalysts.forEach((type, amount) -> {
             boolean available = this.subtract(type, amount);
             if (!available) valid.set(false);
         });
@@ -209,22 +209,18 @@ public class TileEntityPedestal extends TileEntity implements ISidedInventory {
         return true;
     }
 
-    private void spawn(ItemStack stack) {
-        if (stack == null || this.worldObj.isRemote) {
-            return;
-        }
+    private EntityItem spawn(ItemStack stack) {
+        if (stack == null || this.worldObj.isRemote) return null;
 
-        double spawnX = this.xCoord + 0.5D;
-        double spawnY = this.yCoord + 1.5D;
-        double spawnZ = this.zCoord + 0.5D;
-
-        EntityItem item = new EntityItem(this.worldObj, spawnX, spawnY, spawnZ, stack);
-
-        item.motionX = 0;
-        item.motionY = 0.1D;
-        item.motionZ = 0;
-
-        this.worldObj.spawnEntityInWorld(item);
+        EntityItem item = new EntityItem(
+                this.worldObj,
+                this.xCoord + 0.5D,
+                this.yCoord + 1.5D,
+                this.zCoord + 0.5D,
+                stack
+        );
+        item.motionX = 0;item.motionY = 0.1D; item.motionZ = 0;
+        return item;
     }
 
     @Override

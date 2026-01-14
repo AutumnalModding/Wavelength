@@ -35,10 +35,7 @@ public class MixinEntityPlayer {
         System.arraycopy(armour, 0, inventory, main.length, armour.length);
 
         for (ItemStack stack : inventory) {
-            if (stack != null) {
-                Item that = stack.getItem();
-                IGravityModifier.populate(that, increase, subtract, multiply, division);
-            }
+            if (stack != null) IGravityModifier.populate(stack, increase, subtract, multiply, division);
         }
 
         IGravityModifier.process(result, increase);

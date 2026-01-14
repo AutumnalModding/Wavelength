@@ -6,6 +6,7 @@ import net.minecraft.block.Block;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.IChunkProvider;
+import xyz.lilyflower.wavelength.content.WavelengthBlockRegistry;
 import xyz.lilyflower.wavelength.content.world.WorldGenGeode;
 import xyz.lilyflower.wavelength.redist.BlockMetaPair;
 
@@ -29,10 +30,10 @@ public class WavelengthWorldgen implements IWorldGenerator {
             default -> null;
         };
 
-        if (geode != null) { // TODO: proper topaz/citrine heights
+        if (geode != null) {
             int minimum = switch (geode.type) {
                 case TOPAZ -> 75;
-                case CITRINE -> 30;
+                case CITRINE -> 47;
                 case AMETHYST -> 5;
             };
 
@@ -47,13 +48,9 @@ public class WavelengthWorldgen implements IWorldGenerator {
     }
 
     public void geodes() {
-        Block basalt = (Block) Block.blockRegistry.getObject("wavelength:basalt");
-        Block calcite = (Block) Block.blockRegistry.getObject("wavelength:calcite");
-        Wavelength.LOGGER.info("Using balcite blocks {} and {}", basalt.getUnlocalizedName(), calcite.getUnlocalizedName());
-
         GEODE_TOPAZ = new WorldGenGeode(
-                new BlockMetaPair(basalt, 0),
-                new BlockMetaPair(calcite, 0),
+                new BlockMetaPair(WavelengthBlockRegistry.BASALT_SMOOTH, 0),
+                new BlockMetaPair(WavelengthBlockRegistry.CALCITE, 0),
                 (Block) Block.blockRegistry.getObject("wavelength:topaz_block"),
                 (Block) Block.blockRegistry.getObject("wavelength:topaz_budding"),
                 (Block) Block.blockRegistry.getObject("wavelength:topaz_bud_medium"),
@@ -62,8 +59,8 @@ public class WavelengthWorldgen implements IWorldGenerator {
         );
 
         GEODE_CITRINE = new WorldGenGeode(
-                new BlockMetaPair(basalt, 0),
-                new BlockMetaPair(calcite, 0),
+                new BlockMetaPair(WavelengthBlockRegistry.BASALT_SMOOTH, 0),
+                new BlockMetaPair(WavelengthBlockRegistry.CALCITE, 0),
                 (Block) Block.blockRegistry.getObject("wavelength:citrine_block"),
                 (Block) Block.blockRegistry.getObject("wavelength:citrine_budding"),
                 (Block) Block.blockRegistry.getObject("wavelength:citrine_bud_medium"),
@@ -72,8 +69,8 @@ public class WavelengthWorldgen implements IWorldGenerator {
         );
 
         GEODE_AMETHYST = new WorldGenGeode(
-                new BlockMetaPair(basalt, 0),
-                new BlockMetaPair(calcite, 0),
+                new BlockMetaPair(WavelengthBlockRegistry.BASALT_SMOOTH, 0),
+                new BlockMetaPair(WavelengthBlockRegistry.CALCITE, 0),
                 (Block) Block.blockRegistry.getObject("wavelength:amethyst_block"),
                 (Block) Block.blockRegistry.getObject("wavelength:amethyst_budding"),
                 (Block) Block.blockRegistry.getObject("wavelength:amethyst_bud_medium"),

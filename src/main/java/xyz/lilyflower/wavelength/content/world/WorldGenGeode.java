@@ -91,7 +91,9 @@ public class WorldGenGeode extends WorldGenerator {
 	 */
 	protected boolean isInvalidCorner(World world, int x, int y, int z) {
 		Block block = world.getBlock(x, y, z);
-		return block.getMaterial() != Material.rock || !block.isOpaqueCube();
+        Material material = block.getMaterial();
+        boolean valid = (material == Material.rock || material == Material.grass || material == Material.sand);
+		return !valid || !block.isOpaqueCube();
 	}
 
 	/**
@@ -162,7 +164,7 @@ public class WorldGenGeode extends WorldGenerator {
 		Iterator<BlockPos> var48 = BlockPos.iterate(blockPos.add(minGenOffset, minGenOffset, minGenOffset), blockPos.add(maxGenOffset, maxGenOffset, maxGenOffset)).iterator();
 
 		Block budBlock;
-        Wavelength.LOGGER.info("Generating {} geode at {} {} {}", this.inner.getUnlocalizedName(), x, y, z);
+        Wavelength.LOGGER.info("Generating {} geode at {} {} {}", this.type.name(), x, y, z);
 		while (true) {
 			double current;
 			double v;

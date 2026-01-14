@@ -54,17 +54,16 @@ public class Wavelength {
         loader.registerRenderers();
         NetworkRegistry.INSTANCE.registerGuiHandler(INSTANCE, new GuiHandler());
 
-        PedestalRecipeManager.instance().register(new PedestalRecipe
-            (
+        PedestalRecipeManager.instance().register(new PedestalRecipe(
                 new ChainedArrayList<ItemStack>()
                         .chainedAdd(new ItemStack(Items.apple))
                         .chainedAdd(new ItemStack(Item.getItemFromBlock(Blocks.gold_block))),
-                new ItemStack(Items.golden_apple),
-                new HashMap<>(),
+                (pedestal, player) -> new ItemStack(Items.golden_apple),
+                (pedestal, player) -> new HashMap<>(),
                 60,
                 player -> true,
                 0,
-                pedestal -> {}
+                (pedestal, stack) -> true
             )
         );
 

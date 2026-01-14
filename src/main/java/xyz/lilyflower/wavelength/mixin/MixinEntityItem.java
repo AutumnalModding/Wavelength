@@ -28,10 +28,7 @@ public class MixinEntityItem {
         List<SolarisExtensions.Pair<EnumFacing, Float>> multiply = new ArrayList<>();
         List<SolarisExtensions.Pair<EnumFacing, Float>> division = new ArrayList<>();
 
-        if (stack != null) {
-            Item that = stack.getItem();
-            IGravityModifier.populate(that, increase, subtract, multiply, division);
-        }
+        if (stack != null) IGravityModifier.populate(stack, increase, subtract, multiply, division);
 
         IGravityModifier.process(result, increase);
         IGravityModifier.process(result, subtract);
