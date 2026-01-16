@@ -16,6 +16,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.stats.AchievementList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import xyz.lilyflower.wavelength.content.WavelengthItemRegistry;
@@ -56,8 +57,8 @@ public class Wavelength {
 
         PedestalRecipeManager.instance().register(new PedestalRecipe(
                 new ChainedArrayList<ItemStack>()
-                        .chainedAdd(new ItemStack(Items.apple))
-                        .chainedAdd(new ItemStack(Item.getItemFromBlock(Blocks.gold_block))),
+                        .chain(new ItemStack(Items.apple))
+                        .chain(new ItemStack(Item.getItemFromBlock(Blocks.gold_block))),
                 (pedestal, player) -> new ItemStack(Items.golden_apple),
                 (pedestal, player) -> new HashMap<>(),
                 60,
@@ -66,6 +67,17 @@ public class Wavelength {
                 (pedestal, stack) -> true
             )
         );
+
+        PedestalRecipeManager.instance().register(PedestalRecipe.BasicT4(
+                new ItemStack(Items.blaze_powder, 4),
+                0,
+                0,
+                0,
+                0,
+                0,
+                40,
+                PedestalRecipe.RequiresAchievement(AchievementList.blazeRod),
+                new ItemStack(Items.blaze_rod)));
 
         EntityRegistry.registerModEntity(
                 EntityGravityBlock.class,

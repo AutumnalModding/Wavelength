@@ -1,10 +1,14 @@
 package xyz.lilyflower.wavelength.content.block;
 
 import com.gtnewhorizon.gtnhlib.client.model.ModelISBRH;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
+import xyz.lilyflower.wavelength.api.BlockTooltippable;
+import xyz.lilyflower.wavelength.api.Tooltipper;
 import xyz.lilyflower.wavelength.content.WavelengthTab;
 import xyz.lilyflower.wavelength.init.Wavelength;
 import xyz.lilyflower.wavelength.handler.GuiHandler;
@@ -20,8 +24,9 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
 import java.util.Random;
+import xyz.lilyflower.wavelength.util.MiscUtils;
 
-public class BlockPedestal extends BlockContainer {
+public class BlockPedestal extends BlockContainer implements BlockTooltippable {
     private final Random random = new Random();
     private final TileEntityPedestal.PedestalTier tier;
 
@@ -140,5 +145,26 @@ public class BlockPedestal extends BlockContainer {
     @Override
     public boolean renderAsNormalBlock() {
         return false;
+    }
+
+    @Override
+    public Tooltipper tooltipper() {
+        return new Tooltipper(player -> {
+            List<String> text = new ArrayList<>();
+            String prefix = switch(this.tier) {
+                case AMETHYST -> "§d";
+                case CITRINE -> "§e";
+                case TOPAZ -> "§b";
+                case ONYX -> "§8";
+                case MOONSTONE -> "§f";
+                default -> "";
+            };
+            String name = switch (this.tier) {
+                case CMY -> "§bC§dM§eY";
+                default -> MiscUtils.CapitalizeFirst(this.tier.name().toLowerCase());
+            };
+            text.add(prefix + name + "§r Variant");
+            return text;
+        });
     }
 }

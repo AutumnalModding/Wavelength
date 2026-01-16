@@ -9,8 +9,13 @@ public class BasicOre extends BlockOre {
     private Item drop = Item.getItemFromBlock(this);
 
     public BasicOre() {
+        this(2, 2);
+    }
+
+    public BasicOre(float hardness, int level) {
         this.setCreativeTab(WavelengthTab.RESOURCES);
-        this.setHarvestLevel("pickaxe", 2);
+        this.setHardness(hardness);
+        this.setHarvestLevel("pickaxe", level);
     }
 
     public BasicOre drops(Item drop) {

@@ -12,6 +12,7 @@ import xyz.lilyflower.solaris.api.ContentRegistry;
 import xyz.lilyflower.solaris.api.LoadStage;
 import xyz.lilyflower.solaris.init.Solaris;
 import xyz.lilyflower.solaris.util.SolarisExtensions;
+import xyz.lilyflower.wavelength.api.BlockTooltippable;
 import xyz.lilyflower.wavelength.content.block.BlockPedestal;
 import xyz.lilyflower.wavelength.content.block.entity.TileEntityPedestal;
 import xyz.lilyflower.wavelength.content.block.gem.BlockAmethyst;
@@ -22,6 +23,8 @@ import xyz.lilyflower.wavelength.content.block.gravity.BlockGravity;
 import xyz.lilyflower.wavelength.content.block.BlockSided;
 import xyz.lilyflower.wavelength.content.block.basic.BasicOre;
 import xyz.lilyflower.wavelength.content.block.basic.BasicPlank;
+import xyz.lilyflower.wavelength.content.item.ItemBlockTooltippable;
+import xyz.lilyflower.wavelength.test.BlockExplosionTest;
 
 @SuppressWarnings("unused")
 public class WavelengthBlockRegistry implements ContentRegistry<Block> {
@@ -31,6 +34,10 @@ public class WavelengthBlockRegistry implements ContentRegistry<Block> {
     private static final Class<?>[] GRAVITY = new Class<?>[]{Material.class, EnumFacing.class, float.class};
 
     private static final String[] woods = new String[]{
+            "slate_noxwood",
+            "ebony_noxwood",
+            "ivory_noxwood",
+            "chestnut_noxwood",
             "weeping_gala",
             "black",
             "blue",
@@ -85,7 +92,11 @@ public class WavelengthBlockRegistry implements ContentRegistry<Block> {
 
         block.setBlockName(unlocalized);
         block.setBlockTextureName(texture);
-        GameRegistry.registerBlock(block, "$APPLYPREFIX$wavelength:" + pair.right());
+
+        String name = "$APPLYPREFIX$wavelength:" + pair.right();
+        if (block instanceof BlockTooltippable tooltippable) {
+            GameRegistry.registerBlock(block, ItemBlockTooltippable.class, name, tooltippable.tooltipper());
+        } else GameRegistry.registerBlock(block, name);
     }
 
     @Override
@@ -98,23 +109,26 @@ public class WavelengthBlockRegistry implements ContentRegistry<Block> {
         return Solaris.STATE == LoadStage.PRELOADER;
     }
 
-    private static Block rock(String name) {
-        return ContentRegistry.create(name, BlockBasic.class, BASIC, BLOCKS, Material.rock);
+    private static Block rock(String name, float hardness, int level) {
+        BlockBasic block = new BlockBasic(Material.rock);
+        block.setHardness(hardness);
+        block.setHarvestLevel("pickaxe", level);
+        BLOCKS.add(new SolarisExtensions.Pair<>(block, name));
+        return block;
     }
 
     static {
-        ContentRegistry.create("pedestal_amethyst", BlockPedestal.class, PEDESTAL, BLOCKS, TileEntityPedestal.PedestalTier.BASIC);
-        ContentRegistry.create("pedestal_citrine", BlockPedestal.class, PEDESTAL, BLOCKS, TileEntityPedestal.PedestalTier.BASIC);
-        ContentRegistry.create("pedestal_topaz", BlockPedestal.class, PEDESTAL, BLOCKS, TileEntityPedestal.PedestalTier.BASIC);
-        ContentRegistry.create("pedestal_all", BlockPedestal.class, PEDESTAL, BLOCKS, TileEntityPedestal.PedestalTier.UPGRADED);
-        ContentRegistry.create("pedestal_onyx", BlockPedestal.class, PEDESTAL, BLOCKS, TileEntityPedestal.PedestalTier.ONYX);
-        ContentRegistry.create("pedestal_moonstone", BlockPedestal.class, PEDESTAL, BLOCKS, TileEntityPedestal.PedestalTier.MOONSTONE);
+        ContentRegistry.create("pedestal_all", BlockPedestal.class, PEDESTAL, BLOCKS, TileEntityPedestal.PedestalTier.CMY);
+        for (String gem : gems) {
+            TileEntityPedestal.PedestalTier tier = TileEntityPedestal.PedestalTier.valueOf(gem.toUpperCase());
+            ContentRegistry.create("pedestal_" + gem, BlockPedestal.class, PEDESTAL, BLOCKS, tier);
+        }
 
         BASALT = ContentRegistry.create("basalt", BlockSided.class, SIDED, BLOCKS, "basalt", Material.rock);
-        BASALT_SMOOTH = rock("basalt_smooth");
-        BASALT_POLISHED = rock("basalt_polished");
-        CALCITE_POLISHED = rock("calcite_polished");
-        CALCITE = rock("calcite");
+        BASALT_SMOOTH = rock("basalt_smooth", 2, 1);
+        BASALT_POLISHED = rock("basalt_polished", 2, 1);
+        CALCITE_POLISHED = rock("calcite_polished", 2, 0);
+        CALCITE = rock("calcite", 2, 0);
         ContentRegistry.create("floatblock_stratine", BlockGravity.class, GRAVITY, BLOCKS, Material.rock, EnumFacing.DOWN,0.5F);
         ContentRegistry.create("floatblock_paltaeria", BlockGravity.class, GRAVITY, BLOCKS, Material.rock, EnumFacing.UP, 0.5F);
         for (String gem : gems) ContentRegistry.create(gem + "_polished", BlockBasic.class, BASIC, BLOCKS, Material.rock);
@@ -151,19 +165,25 @@ public class WavelengthBlockRegistry implements ContentRegistry<Block> {
             BLOCKS.add(new SolarisExtensions.Pair<>(ore, gem + "_ore"));
         }
 
-        ((BasicOre) ContentRegistry.create("ore_shimmerstone", BasicOre.class, ContentRegistry.EMPTY, BLOCKS)).drops(WavelengthItemRegistry.GEM_SHIMMERSTONE);
+        BLOCKS.add(new SolarisExtensions.Pair<>(new BasicOre(4.5F, 3), "ore_shimmerstone"));
         for (String ore : ores) {
             try {
                 Class<WavelengthItemRegistry> clazz = WavelengthItemRegistry.class;
                 Field field = clazz.getField("RAW_" + ore.toUpperCase());
                 Item raw = (Item) field.get(null);
-                BasicOre block = new BasicOre().drops(raw);
+                BasicOre block = new BasicOre(5F, 3).drops(raw);
                 BLOCKS.add(new SolarisExtensions.Pair<>(block, "ore_" + ore));
             } catch (ReflectiveOperationException ignored) {}
         }
 
-        Block stratines = new BlockGravity(Material.rock,EnumFacing.DOWN,0.05F).setCreativeTab(WavelengthTab.RESOURCES);
-        Block paltaeria = new BlockGravity(Material.rock, EnumFacing.UP, 0.05F).setCreativeTab(WavelengthTab.RESOURCES);
+        Block stratines = new BlockGravity(Material.rock,EnumFacing.DOWN,0.05F, "pickaxe", 3)
+                .setHardness(3.0F)
+                .setCreativeTab(WavelengthTab.RESOURCES);
+
+        Block paltaeria = new BlockGravity(Material.rock, EnumFacing.UP, 0.05F, "pickaxe", 3)
+                .setHardness(3.0F)
+                .setCreativeTab(WavelengthTab.RESOURCES);
+
 
         BLOCKS.add(new SolarisExtensions.Pair<>(paltaeria, "orePaltaeria"));
         BLOCKS.add(new SolarisExtensions.Pair<>(stratines, "ore_stratine"));
@@ -171,5 +191,7 @@ public class WavelengthBlockRegistry implements ContentRegistry<Block> {
         ContentRegistry.create("log_spirit_sallow", BlockSided.class, SIDED, BLOCKS, "spirit_sallow_log", Material.wood);
         for (String wood : woods) ContentRegistry.create("log_" + wood, BlockSided.class, SIDED, BLOCKS, wood + "_log", Material.wood);
         for (String wood : woods) ContentRegistry.create("plank_" + wood, BasicPlank.class, new Class<?>[]{String.class}, BLOCKS, wood + "_planks");
+
+        ContentRegistry.create("debug_test_explosion", BlockExplosionTest.class, ContentRegistry.EMPTY, BLOCKS);
     }
 }

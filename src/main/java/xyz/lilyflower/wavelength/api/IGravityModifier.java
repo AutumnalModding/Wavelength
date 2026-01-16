@@ -1,5 +1,6 @@
 package xyz.lilyflower.wavelength.api;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import net.minecraft.block.Block;
@@ -12,6 +13,14 @@ import xyz.lilyflower.solaris.util.SolarisExtensions;
 
 public interface IGravityModifier {
     List<SolarisExtensions.TriPair<Action, EnumFacing, Float>> modifiers();
+    default boolean valid(ContainerType type) { return true; }
+
+    enum ContainerType {
+        HELD,
+        ARMOUR,
+        BAUBLES,
+        INVENTORY
+    }
 
     enum Action {
         ADD,
@@ -41,28 +50,44 @@ public interface IGravityModifier {
         }
     }
 
-    static void populate(
-            ItemStack stack,
-            List<SolarisExtensions.Pair<EnumFacing, Float>> increase,
-            List<SolarisExtensions.Pair<EnumFacing, Float>> subtract,
-            List<SolarisExtensions.Pair<EnumFacing, Float>> multiply,
-            List<SolarisExtensions.Pair<EnumFacing, Float>> division
-    ) {
-        IGravityModifier gravity = null;
-        Item item = stack.getItem();
-        if (item instanceof IGravityModifier gravmod) gravity = gravmod;
-        else if (
-            item instanceof ItemBlock block &&
-            Block.getBlockFromItem(block) instanceof IGravityModifier gravmod
-        ) gravity = gravmod;
-        if (gravity != null) gravity.modifiers().forEach(modifier -> {
-            SolarisExtensions.Pair<EnumFacing, Float> entry = new SolarisExtensions.Pair<>(modifier.middle(), modifier.right() * stack.stackSize);
-            switch (modifier.left()) {
-                case ADD -> increase.add(entry);
-                case SUBTRACT -> subtract.add(entry);
-                case MULTIPLY -> multiply.add(entry);
-                case DIVIDE -> division.add(entry);
+    @SuppressWarnings("unchecked")
+    static void populate(ItemStack[] stacks, ContainerType type, List<SolarisExtensions.Pair<EnumFacing, Float>>[] modifiers) {
+        if (modifiers.length < 4) {
+            List<SolarisExtensions.Pair<EnumFacing, Float>>[] old = modifiers.clone();
+            modifiers = new List[]{
+                    new ArrayList<>(),
+                    new ArrayList<>(),
+                    new ArrayList<>(),
+                    new ArrayList<>()
+            };
+            System.arraycopy(old, 0, modifiers, 0, old.length);
+        }
+
+        for (int index = 0; index < modifiers.length; index++) {
+            if (modifiers[index] == null) modifiers[index] = new ArrayList<>();
+        }
+
+        for (ItemStack stack : stacks) {
+            if (stack != null) {
+                IGravityModifier gravity = null;
+                Item item = stack.getItem();
+                if (item instanceof IGravityModifier gravmod) gravity = gravmod;
+                else if (
+                        item instanceof ItemBlock block &&
+                                Block.getBlockFromItem(block) instanceof IGravityModifier gravmod
+                ) gravity = gravmod;
+                if (gravity != null && gravity.valid(type)) {
+                    for (SolarisExtensions.TriPair<Action, EnumFacing, Float> modifier : gravity.modifiers()) {
+                        SolarisExtensions.Pair<EnumFacing, Float> entry = new SolarisExtensions.Pair<>(modifier.middle(), modifier.right() * stack.stackSize);
+                        switch (modifier.left()) {
+                            case ADD -> modifiers[0].add(entry);
+                            case SUBTRACT -> modifiers[1].add(entry);
+                            case MULTIPLY -> modifiers[2].add(entry);
+                            case DIVIDE -> modifiers[3].add(entry);
+                        }
+                    }
+                }
             }
-        });
+        }
     }
 }

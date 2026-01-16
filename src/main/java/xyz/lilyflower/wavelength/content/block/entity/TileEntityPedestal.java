@@ -25,8 +25,10 @@ import xyz.lilyflower.wavelength.util.recipe.PedestalRecipeManager;
 
 public class TileEntityPedestal extends TileEntity implements ISidedInventory {
     public enum PedestalTier {
-        BASIC(13),
-        UPGRADED(13),
+        TOPAZ(13),
+        CITRINE(13),
+        AMETHYST(13),
+        CMY(13),
         ONYX(14),
         MOONSTONE(15);
 
@@ -42,7 +44,7 @@ public class TileEntityPedestal extends TileEntity implements ISidedInventory {
 
         public static PedestalTier from(int ordinal) {
             if (ordinal < 0 || ordinal >= values().length) {
-                return BASIC;
+                return AMETHYST;
             }
             return values()[ordinal];
         }
@@ -60,7 +62,7 @@ public class TileEntityPedestal extends TileEntity implements ISidedInventory {
 
     @SuppressWarnings("unused")
     public TileEntityPedestal() {
-        this(PedestalTier.BASIC);
+        this(PedestalTier.AMETHYST);
     }
 
     public TileEntityPedestal(PedestalTier tier) {
@@ -108,6 +110,10 @@ public class TileEntityPedestal extends TileEntity implements ISidedInventory {
             this.progress = 0;
             this.markDirty();
         }
+    }
+
+    public Map<PastelType, Integer> catalysts() {
+        return this.catalysts;
     }
 
     public void add(PastelType type, int amount) {
@@ -323,8 +329,8 @@ public class TileEntityPedestal extends TileEntity implements ISidedInventory {
                 Map<String, NBTBase> map = (Map<String, NBTBase>) tags.get(compound);
                 map.forEach((key, value) -> {
                     PastelType type = PastelType.valueOf(key.toUpperCase());
-                    if (value instanceof NBTTagInt integer) {
-                        int amount = integer.func_150287_d();
+                    if (value instanceof NBTTagInt tag) {
+                        int amount = tag.func_150287_d();
                         this.catalysts.put(type, amount);
                     }
                 });
@@ -353,8 +359,6 @@ public class TileEntityPedestal extends TileEntity implements ISidedInventory {
             }
         }
         compound.setTag("Items", list);
-
-
         NBTTagCompound catalysts = new NBTTagCompound();
         this.catalysts.forEach((type, amount) -> catalysts.setInteger(type.name(), amount));
         compound.setTag("Catalysts", catalysts);

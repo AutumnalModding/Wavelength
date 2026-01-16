@@ -1,7 +1,7 @@
 package xyz.lilyflower.wavelength.handler;
 
 import xyz.lilyflower.wavelength.client.gui.GuiPedestal;
-import xyz.lilyflower.wavelength.inventory.ContainerPedestal;
+import xyz.lilyflower.wavelength.container.ContainerPedestal;
 import xyz.lilyflower.wavelength.content.block.entity.TileEntityPedestal;
 import cpw.mods.fml.common.network.IGuiHandler;
 import net.minecraft.entity.player.EntityPlayer;

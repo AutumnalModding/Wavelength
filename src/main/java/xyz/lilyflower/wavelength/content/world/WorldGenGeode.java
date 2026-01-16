@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.Random;
 import xyz.lilyflower.solaris.util.SolarisExtensions;
 import xyz.lilyflower.wavelength.init.Wavelength;
-import xyz.lilyflower.wavelength.redist.BlockMetaPair;
-import xyz.lilyflower.wavelength.redist.BlockPos;
-import xyz.lilyflower.wavelength.redist.DoublePerlinNoiseSampler;
+import xyz.lilyflower.wavelength.include.BlockMetaPair;
+import xyz.lilyflower.wavelength.include.BlockPos;
+import xyz.lilyflower.wavelength.include.DoublePerlinNoiseSampler;
 
 public class WorldGenGeode extends WorldGenerator {
     public enum Type {
@@ -92,7 +92,7 @@ public class WorldGenGeode extends WorldGenerator {
 	protected boolean isInvalidCorner(World world, int x, int y, int z) {
 		Block block = world.getBlock(x, y, z);
         Material material = block.getMaterial();
-        boolean valid = (material == Material.rock || material == Material.grass || material == Material.sand);
+        boolean valid = (material == Material.rock || material == Material.grass || material == Material.sand || material == Material.water);
 		return !valid || !block.isOpaqueCube();
 	}
 

@@ -8,7 +8,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.IChunkProvider;
 import xyz.lilyflower.wavelength.content.WavelengthBlockRegistry;
 import xyz.lilyflower.wavelength.content.world.WorldGenGeode;
-import xyz.lilyflower.wavelength.redist.BlockMetaPair;
+import xyz.lilyflower.wavelength.include.BlockMetaPair;
 
 public class WavelengthWorldgen implements IWorldGenerator {
     public static final WavelengthWorldgen INSTANCE = new WavelengthWorldgen();

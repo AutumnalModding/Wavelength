@@ -1,0 +1,50 @@
+itemGroup.wavelength_blocks=Wavelength Blocks
+itemGroup.wavelength_materials=Wavelength Resources
+
+container.pedestal_amethyst=Pigment Pedestal
+container.pedestal_citrine=Pigment Pedestal
+container.pedestal_topaz=Pigment Pedestal
+container.pedestal_onyx=Pigment Pedestal
+container.pedestal_cmy=Pigment Pedestal
+container.pedestal_moonstone=Pigment Pedestal
+
+tile.wavelength.pedestal_amethyst.name=Pigment Pedestal
+tile.wavelength.pedestal_citrine.name=Pigment Pedestal
+tile.wavelength.pedestal_topaz.name=Pigment Pedestal
+tile.wavelength.pedestal_onyx.name=Pigment Pedestal
+tile.wavelength.pedestal_all.name=Pigment Pedestal
+tile.wavelength.pedestal_moonstone.name=Pigment Pedestal
+
+tile.wavelength.amethyst_budding.name=Budding Amethyst
+tile.wavelength.citrine_budding.name=Budding Citrine
+tile.wavelength.topaz_budding.name=Budding Topaz
+tile.wavelength.onyx_budding.name=Budding Onyx
+tile.wavelength.moonstone_budding.name=Budding Moonstone
+
+tile.wavelength.amethyst_polished.name=Polished Amethyst
+tile.wavelength.citrine_polished.name=Polished Citrine
+tile.wavelength.topaz_polished.name=Polished Topaz
+tile.wavelength.onyx_polished.name=Polished Onyx
+tile.wavelength.moonstone_polished.name=Polished Moonstone
+
+tile.wavelength.amethyst_block.name=Amethyst Block
+tile.wavelength.citrine_block.name=Citrine Block
+tile.wavelength.topaz_block.name=Topaz Block
+tile.wavelength.onyx_block.name=Onyx Block
+tile.wavelength.moonstone_block.name=Moonstone Block
+
+tile.wavelength.ore_amethyst.name=Amethyst Ore
+tile.wavelength.ore_citrine.name=Citrine Ore
+tile.wavelength.ore_topaz.name=Topaz Ore
+tile.wavelength.ore_onyx.name=Onyx Ore
+tile.wavelength.ore_moonstone.name=Moonstone Ore
+tile.wavelength.ore_stratine.name=Stratine Ore
+tile.wavelength.ore_paltaeria.name=Paltaeria Ore
+tile.wavelength.ore_shimmerstone.name=Shimmerstone Ore
+
+tile.wavelength.basalt.name=Basalt
+tile.wavelength.basalt_polished.name=Polished Basalt
+tile.wavelength.basalt_smooth.name=Smooth Basalt
+
+tile.wavelength.calcite.name=Calcite
+tile.wavelength.calcite_polished.name=Polished Calcite

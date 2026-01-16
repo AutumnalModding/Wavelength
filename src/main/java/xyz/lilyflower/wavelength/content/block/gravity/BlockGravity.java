@@ -26,9 +26,14 @@ public class BlockGravity extends Block implements IGravityModifier {
 
     public BlockGravity(Material material, EnumFacing direction, float amount) {
         this(material,
-                new ChainedArrayList<SolarisExtensions.TriPair<Action, EnumFacing, Float>>().chainedAdd(
+                new ChainedArrayList<SolarisExtensions.TriPair<Action, EnumFacing, Float>>().chain(
                 new SolarisExtensions.TriPair<>(Action.ADD, direction, amount)
         ), direction);
+    }
+
+    public BlockGravity(Material material, EnumFacing direction, float amount, String type, int level) {
+        this(material, direction, amount);
+        this.setHarvestLevel(type, level);
     }
 
     @Override

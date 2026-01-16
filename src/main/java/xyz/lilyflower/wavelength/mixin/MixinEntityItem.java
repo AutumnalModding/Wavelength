@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,23 +16,22 @@ import xyz.lilyflower.wavelength.api.IGravityModifier;
 
 @Mixin(EntityItem.class)
 public class MixinEntityItem {
+    @SuppressWarnings("unchecked")
     @Inject(method = "onUpdate", at = @At("HEAD"))
     public void gravify(CallbackInfo ci) {
         EntityItem entity = (EntityItem) (Object) this;
         ItemStack stack = entity.getEntityItem();
 
         Map<EnumFacing, Float> result = new HashMap<>();
-        List<SolarisExtensions.Pair<EnumFacing, Float>> increase = new ArrayList<>();
-        List<SolarisExtensions.Pair<EnumFacing, Float>> subtract = new ArrayList<>();
-        List<SolarisExtensions.Pair<EnumFacing, Float>> multiply = new ArrayList<>();
-        List<SolarisExtensions.Pair<EnumFacing, Float>> division = new ArrayList<>();
+        List<SolarisExtensions.Pair<EnumFacing, Float>>[] sets = new ArrayList[]{
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>()
+        };
 
-        if (stack != null) IGravityModifier.populate(stack, increase, subtract, multiply, division);
-
-        IGravityModifier.process(result, increase);
-        IGravityModifier.process(result, subtract);
-        IGravityModifier.process(result, multiply);
-        IGravityModifier.process(result, division);
+        if (stack != null) IGravityModifier.populate(new ItemStack[]{stack}, IGravityModifier.ContainerType.INVENTORY, sets);
+        for (List<SolarisExtensions.Pair<EnumFacing, Float>> set : sets) IGravityModifier.process(result, set);
         IGravityModifier.apply(result, entity);
     }
 }

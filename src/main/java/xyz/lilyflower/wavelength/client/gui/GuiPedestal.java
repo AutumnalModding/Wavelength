@@ -1,15 +1,19 @@
 package xyz.lilyflower.wavelength.client.gui;
 
+import java.util.Map;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import xyz.lilyflower.wavelength.inventory.ContainerPedestal;
+import xyz.lilyflower.wavelength.container.ContainerPedestal;
 import xyz.lilyflower.wavelength.content.block.entity.TileEntityPedestal;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
+import xyz.lilyflower.wavelength.util.PastelType;
 import xyz.lilyflower.wavelength.util.PedestalRecipe;
 import xyz.lilyflower.wavelength.util.recipe.PedestalRecipeManager;
 
@@ -38,6 +42,9 @@ public class GuiPedestal extends GuiContainer {
                 entity.getInventoryName() :
                 I18n.format(entity.getInventoryName());
 
+        FontRenderer font = this.fontRendererObj;
+        TextureManager manager = this.mc.getTextureManager();
+
         EntityPlayer player = Minecraft.getMinecraft().thePlayer;
         ItemStack[] grid = new ItemStack[9];
         System.arraycopy(this.entity.inventory, 0, grid, 0, 9);
@@ -47,13 +54,27 @@ public class GuiPedestal extends GuiContainer {
             float level = itemRender.zLevel;
             GL11.glEnable(GL11.GL_DEPTH_TEST);
             itemRender.zLevel = 100.0F;
-            itemRender.renderItemAndEffectIntoGUI(this.fontRendererObj, this.mc.getTextureManager(), output, 127, 64);
-            itemRender.renderItemOverlayIntoGUI(this.fontRendererObj, this.mc.getTextureManager(), output, 127, 64, null);
+            itemRender.renderItemAndEffectIntoGUI(font, manager, output, 127, 64);
+            itemRender.renderItemOverlayIntoGUI(font, manager, output, 127, 64, null);
             itemRender.zLevel = level;
             GL11.glDisable(GL11.GL_DEPTH_TEST);
         }
-        this.fontRendererObj.drawString(name, 8, 34, 4210752);
-        this.fontRendererObj.drawString(I18n.format("container.inventory"), 8, 128, 4210752);
+
+        int width = font.getStringWidth(name);
+        int center = (176 - width) / 2;
+        font.drawString(name, center, 32, 4210752);
+
+        StringBuilder pigment = new StringBuilder();
+        Map<PastelType, Integer> catalysts = this.entity.catalysts();
+        pigment.append(String.format("%04d", catalysts.get(PastelType.AMETHYST))).append(" | ");
+        pigment.append(String.format("%04d", catalysts.get(PastelType.CITRINE))).append(" | ");
+        pigment.append(String.format("%04d", catalysts.get(PastelType.TOPAZ)));
+        if (this.entity.tier.ordinal() >= 4) pigment.append(" | ").append(String.format("%04d", catalysts.get(PastelType.ONYX)));
+        if (this.entity.tier.ordinal() == 5) pigment.append(" | ").append(String.format("%04d", catalysts.get(PastelType.MOONSTONE)));
+        String values = pigment.toString();
+        width = font.getStringWidth(values);
+        center = (176 - width) / 2;
+        font.drawString(values, center, 124, 4210752);
     }
 
     @Override

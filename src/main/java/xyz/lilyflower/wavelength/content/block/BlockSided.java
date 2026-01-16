@@ -8,6 +8,8 @@ import net.minecraft.block.BlockLog;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.util.IIcon;
+import net.minecraft.world.IBlockAccess;
+import net.minecraftforge.common.util.ForgeDirection;
 import xyz.lilyflower.wavelength.content.WavelengthTab;
 
 public class BlockSided extends BlockLog {
@@ -23,7 +25,7 @@ public class BlockSided extends BlockLog {
             modifiers.setAccessible(true);
             modifiers.setInt(field, field.getModifiers() & -17);
             field.setAccessible(true);
-            field.set(this, Material.rock);
+            field.set(this, material);
         } catch (ReflectiveOperationException ignored) {}
     }
 
@@ -33,5 +35,10 @@ public class BlockSided extends BlockLog {
         this.field_150166_b = new IIcon[1];
         this.field_150167_a[0] = reg.registerIcon(this.texture);
         this.field_150166_b[0] = reg.registerIcon(this.texture + "_top");
+    }
+
+    @Override
+    public int getFlammability(IBlockAccess world, int x, int y, int z, ForgeDirection face) {
+        return this.blockMaterial == Material.wood ? 75 : 0;
     }
 }

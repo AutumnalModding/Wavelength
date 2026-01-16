@@ -1,4 +1,4 @@
-package xyz.lilyflower.wavelength.redist;
+package xyz.lilyflower.wavelength.include;
 
 import net.minecraft.block.Block;
 import net.minecraftforge.oredict.OreDictionary;

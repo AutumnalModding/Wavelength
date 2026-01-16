@@ -1,4 +1,4 @@
-package xyz.lilyflower.wavelength.redist;
+package xyz.lilyflower.wavelength.include;
 
 import com.google.common.base.Objects;
 import net.minecraft.util.MathHelper;

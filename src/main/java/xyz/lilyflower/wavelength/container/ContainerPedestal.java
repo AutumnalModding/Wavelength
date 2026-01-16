@@ -1,4 +1,4 @@
-package xyz.lilyflower.wavelength.inventory;
+package xyz.lilyflower.wavelength.container;
 
 import xyz.lilyflower.wavelength.content.block.entity.TileEntityPedestal;
 import net.minecraft.entity.player.EntityPlayer;

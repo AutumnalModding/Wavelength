@@ -1,4 +1,4 @@
-package xyz.lilyflower.wavelength.redist;
+package xyz.lilyflower.wavelength.include;
 
 import gnu.trove.iterator.TDoubleIterator;
 import gnu.trove.list.TDoubleList;
