@@ -1,4 +1,4 @@
-package xyz.lilyflower.wavelength.content.item;
+package xyz.lilyflower.wavelength.item.misc;
 
 import java.util.List;
 import net.minecraft.creativetab.CreativeTabs;
@@ -7,7 +7,7 @@ import xyz.lilyflower.solaris.util.SolarisExtensions;
 import xyz.lilyflower.wavelength.api.IGravityModifier;
 import xyz.lilyflower.wavelength.util.ChainedArrayList;
 
-public class ItemFloaty extends ItemBasic implements IGravityModifier {
+public class ItemFloaty extends ItemTabbable implements IGravityModifier {
     private final List<SolarisExtensions.TriPair<Action, EnumFacing, Float>> modifiers;
 
     public ItemFloaty(CreativeTabs tab, List<SolarisExtensions.TriPair<Action, EnumFacing, Float>> modifiers) {

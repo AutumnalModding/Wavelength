@@ -1,4 +1,4 @@
-package xyz.lilyflower.wavelength.content.block.entity;
+package xyz.lilyflower.wavelength.block.entity;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -307,13 +307,13 @@ public class TileEntityPedestal extends TileEntity implements ISidedInventory {
     @SuppressWarnings("unchecked")
     public void readFromNBT(NBTTagCompound compound) {
         super.readFromNBT(compound);
-        this.tier = PedestalTier.from(compound.getInteger("Tier"));
+        this.tier = PedestalTier.from(compound.getInteger("tier"));
         this.inventory = new ItemStack[this.tier.size()];
-        if (compound.hasKey("CustomName", 8)) { this.name = compound.getString("CustomName"); }
+        if (compound.hasKey("name", 8)) { this.name = compound.getString("name"); }
 
-        NBTTagList tagList = compound.getTagList("Items", 10);
-        for (int i = 0; i < tagList.tagCount(); i++) {
-            NBTTagCompound itemTag = tagList.getCompoundTagAt(i);
+        NBTTagList inventory = compound.getTagList("inventory", 10);
+        for (int i = 0; i < inventory.tagCount(); i++) {
+            NBTTagCompound itemTag = inventory.getCompoundTagAt(i);
             int slot = itemTag.getByte("Slot") & 255;
 
             if (slot < this.inventory.length) {
@@ -322,11 +322,12 @@ public class TileEntityPedestal extends TileEntity implements ISidedInventory {
         }
 
 
-        if (compound.hasKey("Catalysts", 10)) {
+        if (compound.hasKey("catalysts", 10)) {
             try {
-                Class<?> clazz = compound.getClass();
+                NBTTagCompound catalysts = compound.getCompoundTag("catalysts");
+                Class<?> clazz = catalysts.getClass();
                 Field tags = clazz.getDeclaredField("tagMap");
-                Map<String, NBTBase> map = (Map<String, NBTBase>) tags.get(compound);
+                Map<String, NBTBase> map = (Map<String, NBTBase>) tags.get(catalysts);
                 map.forEach((key, value) -> {
                     PastelType type = PastelType.valueOf(key.toUpperCase());
                     if (value instanceof NBTTagInt tag) {
@@ -337,17 +338,17 @@ public class TileEntityPedestal extends TileEntity implements ISidedInventory {
             } catch (ReflectiveOperationException ignored) {}
         }
 
-        this.active = compound.getBoolean("IsCrafting");
-        this.progress = compound.getInteger("CraftingProgress");
+        this.active = compound.getBoolean("active");
+        this.progress = compound.getInteger("progress");
     }
 
     @Override
     public void writeToNBT(NBTTagCompound compound) {
         super.writeToNBT(compound);
-        compound.setInteger("Tier", this.tier.ordinal());
-        compound.setBoolean("IsCrafting", this.active);
-        compound.setInteger("CraftingProgress", this.progress);
-        if (this.name != null && !this.name.isEmpty()) compound.setString("CustomName", this.name);
+        compound.setInteger("tier", this.tier.ordinal());
+        compound.setBoolean("active", this.active);
+        compound.setInteger("progress", this.progress);
+        if (this.name != null && !this.name.isEmpty()) compound.setString("name", this.name);
 
         NBTTagList list = new NBTTagList();
         for (int i = 0; i < this.inventory.length; i++) {
@@ -358,10 +359,10 @@ public class TileEntityPedestal extends TileEntity implements ISidedInventory {
                 list.appendTag(itemTag);
             }
         }
-        compound.setTag("Items", list);
+        compound.setTag("inventory", list);
         NBTTagCompound catalysts = new NBTTagCompound();
         this.catalysts.forEach((type, amount) -> catalysts.setInteger(type.name(), amount));
-        compound.setTag("Catalysts", catalysts);
+        compound.setTag("catalysts", catalysts);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package xyz.lilyflower.wavelength.content.item;
+package xyz.lilyflower.wavelength.item.misc;
 
 import java.util.List;
 import net.minecraft.block.Block;

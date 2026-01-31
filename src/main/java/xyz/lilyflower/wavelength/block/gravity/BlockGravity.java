@@ -1,4 +1,4 @@
-package xyz.lilyflower.wavelength.content.block.gravity;
+package xyz.lilyflower.wavelength.block.gravity;
 
 import java.util.List;
 import java.util.Random;
@@ -9,8 +9,8 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import xyz.lilyflower.solaris.util.SolarisExtensions;
 import xyz.lilyflower.wavelength.api.IGravityModifier;
-import xyz.lilyflower.wavelength.content.WavelengthTab;
-import xyz.lilyflower.wavelength.content.entity.EntityGravityBlock;
+import xyz.lilyflower.wavelength.util.WavelengthTab;
+import xyz.lilyflower.wavelength.entity.EntityGravityBlock;
 import xyz.lilyflower.wavelength.util.ChainedArrayList;
 
 public class BlockGravity extends Block implements IGravityModifier {

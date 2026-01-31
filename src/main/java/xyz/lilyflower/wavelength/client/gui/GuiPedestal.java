@@ -7,7 +7,7 @@ import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import xyz.lilyflower.wavelength.container.ContainerPedestal;
-import xyz.lilyflower.wavelength.content.block.entity.TileEntityPedestal;
+import xyz.lilyflower.wavelength.block.entity.TileEntityPedestal;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;

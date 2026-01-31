@@ -1,8 +1,8 @@
-package xyz.lilyflower.wavelength.content.block.gem;
+package xyz.lilyflower.wavelength.block.gem;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import xyz.lilyflower.wavelength.content.WavelengthTab;
+import xyz.lilyflower.wavelength.util.WavelengthTab;
 
 public class BlockAmethyst extends Block {
     public BlockAmethyst() {

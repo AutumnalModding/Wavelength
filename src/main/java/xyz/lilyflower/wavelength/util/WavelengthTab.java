@@ -1,4 +1,4 @@
-package xyz.lilyflower.wavelength.content;
+package xyz.lilyflower.wavelength.util;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
@@ -31,6 +31,7 @@ public class WavelengthTab extends CreativeTabs {
         this.stack = new ItemStack(this.icon);
     }
 
-    public static final WavelengthTab BLOCKS = new WavelengthTab("wavelength_blocks", Item.getItemFromBlock(Blocks.stone));
+    public static final WavelengthTab BLOCKS = new WavelengthTab("wavelength_blocks", Items.brick);
     public static final WavelengthTab RESOURCES = new WavelengthTab("wavelength_materials", Items.iron_ingot);
+    public static final WavelengthTab EQUIPMENT = new WavelengthTab("wavelength_gear", Items.iron_chestplate);
 }

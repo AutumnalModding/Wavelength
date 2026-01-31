@@ -7,9 +7,8 @@ import java.util.List;
 import java.util.Map;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
-import xyz.lilyflower.wavelength.content.block.entity.TileEntityPedestal;
+import xyz.lilyflower.wavelength.block.entity.TileEntityPedestal;
 import xyz.lilyflower.wavelength.util.PedestalRecipe;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 
 public class PedestalRecipeManager {

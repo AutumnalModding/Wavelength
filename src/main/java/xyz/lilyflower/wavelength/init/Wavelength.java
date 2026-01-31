@@ -1,5 +1,6 @@
 package xyz.lilyflower.wavelength.init;
 
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLConstructionEvent;
@@ -7,6 +8,7 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLLoadCompleteEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.eventhandler.EventBus;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -19,10 +21,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.stats.AchievementList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import xyz.lilyflower.wavelength.content.WavelengthItemRegistry;
-import xyz.lilyflower.wavelength.content.WavelengthTab;
-import xyz.lilyflower.wavelength.content.block.entity.TileEntityPedestal;
-import xyz.lilyflower.wavelength.content.entity.EntityGravityBlock;
+import xyz.lilyflower.wavelength.event.WavelengthPlayerEventHandler;
+import xyz.lilyflower.wavelength.registry.WavelengthItemRegistry;
+import xyz.lilyflower.wavelength.util.WavelengthTab;
+import xyz.lilyflower.wavelength.block.entity.TileEntityPedestal;
+import xyz.lilyflower.wavelength.entity.EntityGravityBlock;
 import xyz.lilyflower.wavelength.handler.GuiHandler;
 import xyz.lilyflower.wavelength.util.ChainedArrayList;
 import xyz.lilyflower.wavelength.util.PedestalRecipe;
@@ -37,24 +40,27 @@ public class Wavelength {
             serverSide = "xyz.lilyflower.wavelength.init.Wavelength"
     )
     public static Wavelength loader;
-    public static Wavelength INSTANCE;
 
     @Mod.EventHandler
     public void construction(FMLConstructionEvent event) {
-        INSTANCE = this;
+        loader = this;
     }
 
     @Mod.EventHandler
     public void pre(FMLPreInitializationEvent event) {
         GameRegistry.registerWorldGenerator(WavelengthWorldgen.INSTANCE, 0);
         GameRegistry.registerTileEntity(TileEntityPedestal.class, "wavelength:pedestal");
+
+        EventBus bus = FMLCommonHandler.instance().bus();
+        bus.register(new WavelengthPlayerEventHandler());
     }
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
         loader.registerRenderers();
-        NetworkRegistry.INSTANCE.registerGuiHandler(INSTANCE, new GuiHandler());
+        NetworkRegistry.INSTANCE.registerGuiHandler(loader, new GuiHandler());
 
+        // TODO move this
         PedestalRecipeManager.instance().register(new PedestalRecipe(
                 new ChainedArrayList<ItemStack>()
                         .chain(new ItemStack(Items.apple))
@@ -83,7 +89,7 @@ public class Wavelength {
                 EntityGravityBlock.class,
                 "gravity_block",
                 0,
-                INSTANCE,
+                loader,
                 64,
                 20,
                 true

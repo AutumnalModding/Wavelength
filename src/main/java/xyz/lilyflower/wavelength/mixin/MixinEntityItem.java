@@ -23,14 +23,9 @@ public class MixinEntityItem {
         ItemStack stack = entity.getEntityItem();
 
         Map<EnumFacing, Float> result = new HashMap<>();
-        List<SolarisExtensions.Pair<EnumFacing, Float>>[] sets = new ArrayList[]{
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new ArrayList<>()
-        };
+        List<SolarisExtensions.Pair<EnumFacing, Float>>[] sets = new ArrayList[0];
 
-        if (stack != null) IGravityModifier.populate(new ItemStack[]{stack}, IGravityModifier.ContainerType.INVENTORY, sets);
+        if (stack != null) sets = IGravityModifier.populate(new ItemStack[]{stack}, IGravityModifier.ContainerType.INVENTORY, sets);
         for (List<SolarisExtensions.Pair<EnumFacing, Float>> set : sets) IGravityModifier.process(result, set);
         IGravityModifier.apply(result, entity);
     }

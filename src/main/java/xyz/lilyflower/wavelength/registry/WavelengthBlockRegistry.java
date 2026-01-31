@@ -1,4 +1,4 @@
-package xyz.lilyflower.wavelength.content;
+package xyz.lilyflower.wavelength.registry;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import java.lang.reflect.Field;
@@ -13,17 +13,17 @@ import xyz.lilyflower.solaris.api.LoadStage;
 import xyz.lilyflower.solaris.init.Solaris;
 import xyz.lilyflower.solaris.util.SolarisExtensions;
 import xyz.lilyflower.wavelength.api.BlockTooltippable;
-import xyz.lilyflower.wavelength.content.block.BlockPedestal;
-import xyz.lilyflower.wavelength.content.block.entity.TileEntityPedestal;
-import xyz.lilyflower.wavelength.content.block.gem.BlockAmethyst;
-import xyz.lilyflower.wavelength.content.block.gem.BlockBudding;
-import xyz.lilyflower.wavelength.content.block.gem.BlockCluster;
-import xyz.lilyflower.wavelength.content.block.basic.BlockBasic;
-import xyz.lilyflower.wavelength.content.block.gravity.BlockGravity;
-import xyz.lilyflower.wavelength.content.block.BlockSided;
-import xyz.lilyflower.wavelength.content.block.basic.BasicOre;
-import xyz.lilyflower.wavelength.content.block.basic.BasicPlank;
-import xyz.lilyflower.wavelength.content.item.ItemBlockTooltippable;
+import xyz.lilyflower.wavelength.util.WavelengthTab;
+import xyz.lilyflower.wavelength.block.BlockPedestal;
+import xyz.lilyflower.wavelength.block.entity.TileEntityPedestal;
+import xyz.lilyflower.wavelength.block.gem.BlockAmethyst;
+import xyz.lilyflower.wavelength.block.gem.BlockBudding;
+import xyz.lilyflower.wavelength.block.gem.BlockCluster;
+import xyz.lilyflower.wavelength.block.misc.BlockTabbable;
+import xyz.lilyflower.wavelength.block.gravity.BlockGravity;
+import xyz.lilyflower.wavelength.block.misc.BlockSided;
+import xyz.lilyflower.wavelength.block.misc.BlockMineableOre;
+import xyz.lilyflower.wavelength.item.misc.ItemBlockTooltippable;
 import xyz.lilyflower.wavelength.test.BlockExplosionTest;
 
 @SuppressWarnings("unused")
@@ -110,7 +110,7 @@ public class WavelengthBlockRegistry implements ContentRegistry<Block> {
     }
 
     private static Block rock(String name, float hardness, int level) {
-        BlockBasic block = new BlockBasic(Material.rock);
+        BlockTabbable block = new BlockTabbable(Material.rock);
         block.setHardness(hardness);
         block.setHarvestLevel("pickaxe", level);
         BLOCKS.add(new SolarisExtensions.Pair<>(block, name));
@@ -131,7 +131,7 @@ public class WavelengthBlockRegistry implements ContentRegistry<Block> {
         CALCITE = rock("calcite", 2, 0);
         ContentRegistry.create("floatblock_stratine", BlockGravity.class, GRAVITY, BLOCKS, Material.rock, EnumFacing.DOWN,0.5F);
         ContentRegistry.create("floatblock_paltaeria", BlockGravity.class, GRAVITY, BLOCKS, Material.rock, EnumFacing.UP, 0.5F);
-        for (String gem : gems) ContentRegistry.create(gem + "_polished", BlockBasic.class, BASIC, BLOCKS, Material.rock);
+        for (String gem : gems) ContentRegistry.create(gem + "_polished", BlockTabbable.class, BASIC, BLOCKS, Material.rock);
         for (String gem : gems) ContentRegistry.create(gem + "_block", BlockAmethyst.class, ContentRegistry.EMPTY, BLOCKS);
 
         Item[] shards = new Item[gems.length];
@@ -161,17 +161,17 @@ public class WavelengthBlockRegistry implements ContentRegistry<Block> {
         for (int index = 0; index < shards.length; index++) {
             Item shard = shards[index];
             String gem = gems[index];
-            BasicOre ore = new BasicOre().drops(shard);
+            BlockMineableOre ore = new BlockMineableOre().drops(shard);
             BLOCKS.add(new SolarisExtensions.Pair<>(ore, gem + "_ore"));
         }
 
-        BLOCKS.add(new SolarisExtensions.Pair<>(new BasicOre(4.5F, 3), "ore_shimmerstone"));
+        BLOCKS.add(new SolarisExtensions.Pair<>(new BlockMineableOre(4.5F, 3), "ore_shimmerstone"));
         for (String ore : ores) {
             try {
                 Class<WavelengthItemRegistry> clazz = WavelengthItemRegistry.class;
                 Field field = clazz.getField("RAW_" + ore.toUpperCase());
                 Item raw = (Item) field.get(null);
-                BasicOre block = new BasicOre(5F, 3).drops(raw);
+                BlockMineableOre block = new BlockMineableOre(5F, 3).drops(raw);
                 BLOCKS.add(new SolarisExtensions.Pair<>(block, "ore_" + ore));
             } catch (ReflectiveOperationException ignored) {}
         }
@@ -190,7 +190,7 @@ public class WavelengthBlockRegistry implements ContentRegistry<Block> {
 
         ContentRegistry.create("log_spirit_sallow", BlockSided.class, SIDED, BLOCKS, "spirit_sallow_log", Material.wood);
         for (String wood : woods) ContentRegistry.create("log_" + wood, BlockSided.class, SIDED, BLOCKS, wood + "_log", Material.wood);
-        for (String wood : woods) ContentRegistry.create("plank_" + wood, BasicPlank.class, new Class<?>[]{String.class}, BLOCKS, wood + "_planks");
+        for (String wood : woods) ContentRegistry.create("plank_" + wood, BlockTabbable.class, BASIC, BLOCKS, Material.wood);
 
         ContentRegistry.create("debug_test_explosion", BlockExplosionTest.class, ContentRegistry.EMPTY, BLOCKS);
     }

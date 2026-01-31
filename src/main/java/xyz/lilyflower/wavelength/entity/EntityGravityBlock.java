@@ -1,4 +1,4 @@
-package xyz.lilyflower.wavelength.content.entity;
+package xyz.lilyflower.wavelength.entity;
 
 import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
 import cpw.mods.fml.relauncher.Side;
@@ -18,7 +18,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
-import xyz.lilyflower.wavelength.content.block.gravity.BlockGravity;
+import xyz.lilyflower.wavelength.block.gravity.BlockGravity;
 
 public class EntityGravityBlock extends Entity implements IEntityAdditionalSpawnData {
     public Block block;

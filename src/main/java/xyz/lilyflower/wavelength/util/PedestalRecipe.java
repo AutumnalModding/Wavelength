@@ -11,7 +11,7 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.stats.Achievement;
-import xyz.lilyflower.wavelength.content.block.entity.TileEntityPedestal;
+import xyz.lilyflower.wavelength.block.entity.TileEntityPedestal;
 
 @Desugar
 public record PedestalRecipe(
@@ -63,6 +63,6 @@ public record PedestalRecipe(
     }
 
     public static Function<EntityPlayer, Boolean> RequiresAchievement(Achievement achievement) {
-        return player -> MiscUtils.HasAchievement(player, achievement);
+        return player -> MiscUtils.achieved(player, achievement);
     }
 }

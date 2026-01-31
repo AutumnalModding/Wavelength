@@ -51,7 +51,7 @@ public interface IGravityModifier {
     }
 
     @SuppressWarnings("unchecked")
-    static void populate(ItemStack[] stacks, ContainerType type, List<SolarisExtensions.Pair<EnumFacing, Float>>[] modifiers) {
+    static List<SolarisExtensions.Pair<EnumFacing, Float>>[] populate(ItemStack[] stacks, ContainerType type, List<SolarisExtensions.Pair<EnumFacing, Float>>[] modifiers) {
         if (modifiers.length < 4) {
             List<SolarisExtensions.Pair<EnumFacing, Float>>[] old = modifiers.clone();
             modifiers = new List[]{
@@ -89,5 +89,7 @@ public interface IGravityModifier {
                 }
             }
         }
+
+        return modifiers;
     }
 }

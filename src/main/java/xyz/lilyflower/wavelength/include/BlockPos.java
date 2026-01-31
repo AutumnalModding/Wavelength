@@ -1,6 +1,5 @@
 package xyz.lilyflower.wavelength.include;
 
-import com.google.common.collect.AbstractIterator;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
@@ -12,8 +11,6 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-
-import java.util.Iterator;
 
 public class BlockPos extends Vec3i {
 
@@ -68,56 +65,8 @@ public class BlockPos extends Vec3i {
 		return new BlockPos(getX() * factor, getY() * factor, getZ() * factor);
 	}
 
-	public BlockPos up() {
-		return this.up(1);
-	}
-
 	public BlockPos subtract(Vec3i vec) {
 		return new BlockPos(getX() - vec.getX(), getY() - vec.getY(), getZ() - vec.getZ());
-	}
-
-	public BlockPos up(int n) {
-		return this.offset(EnumFacing.UP, n);
-	}
-
-	public BlockPos down() {
-		return this.down(1);
-	}
-
-	public BlockPos down(int n) {
-		return this.offset(EnumFacing.DOWN, n);
-	}
-
-	public BlockPos north() {
-		return this.north(1);
-	}
-
-	public BlockPos north(int n) {
-		return this.offset(EnumFacing.NORTH, n);
-	}
-
-	public BlockPos south() {
-		return this.south(1);
-	}
-
-	public BlockPos south(int n) {
-		return this.offset(EnumFacing.SOUTH, n);
-	}
-
-	public BlockPos west() {
-		return this.west(1);
-	}
-
-	public BlockPos west(int n) {
-		return this.offset(EnumFacing.WEST, n);
-	}
-
-	public BlockPos east() {
-		return this.east(1);
-	}
-
-	public BlockPos east(int n) {
-		return this.offset(EnumFacing.EAST, n);
 	}
 
 	public BlockPos offset(EnumFacing facing) {
@@ -143,7 +92,7 @@ public class BlockPos extends Vec3i {
 	}
 
 	public long toLong() {
-		return (getX() & X_MASK) << X_SHIFT | (getY() & Y_MASK) << Y_SHIFT | (getZ() & Z_MASK) << 0;
+		return (getX() & X_MASK) << X_SHIFT | (getY() & Y_MASK) << Y_SHIFT | (getZ() & Z_MASK);
 	}
 
 	public static BlockPos fromLong(long serialized) {
@@ -170,15 +119,15 @@ public class BlockPos extends Vec3i {
 				Math.max(start.getY(), end.getY()), Math.max(start.getZ(), end.getZ()));
 	}
 
-	public static BlockPos readFromNBT(NBTTagCompound p_129240_) {
-		return new BlockPos(p_129240_.getInteger("X"), p_129240_.getInteger("Y"), p_129240_.getInteger("Z"));
+	public static BlockPos readFromNBT(NBTTagCompound tag) {
+		return new BlockPos(tag.getInteger("X"), tag.getInteger("Y"), tag.getInteger("Z"));
 	}
 
-	public static NBTTagCompound writeToNBT(BlockPos p_129225_) {
+	public static NBTTagCompound writeToNBT(BlockPos pos) {
 		NBTTagCompound compoundtag = new NBTTagCompound();
-		compoundtag.setInteger("X", p_129225_.getX());
-		compoundtag.setInteger("Y", p_129225_.getY());
-		compoundtag.setInteger("Z", p_129225_.getZ());
+		compoundtag.setInteger("X", pos.getX());
+		compoundtag.setInteger("Y", pos.getY());
+		compoundtag.setInteger("Z", pos.getZ());
 		return compoundtag;
 	}
 
@@ -194,46 +143,8 @@ public class BlockPos extends Vec3i {
 		return world.getBlockMetadata(getX(), getY(), getZ());
 	}
 
-	public static Iterable<BlockPos> iterate(final int startX, final int startY, final int startZ, final int endX,
-											 final int endY, final int endZ) {
-
-		return new Iterable<BlockPos>() {
-			public Iterator<BlockPos> iterator() {
-				return new AbstractIterator<BlockPos>() {
-					private boolean first = true;
-					private int lastPosX;
-					private int lastPosY;
-					private int lastPosZ;
-
-					@Override
-					protected BlockPos computeNext() {
-						if (this.first) {
-							this.first = false;
-							this.lastPosX = startX;
-							this.lastPosY = startY;
-							this.lastPosZ = startZ;
-							return new BlockPos(startX, startY, startZ);
-						} else if (this.lastPosX == endX && this.lastPosY == endY
-								&& this.lastPosZ == endZ) {
-							return this.endOfData();
-						} else {
-							if (this.lastPosX < endX) {
-								++this.lastPosX;
-							} else if (this.lastPosY < endY) {
-								this.lastPosX = startX;
-								++this.lastPosY;
-							} else if (this.lastPosZ < endZ) {
-								this.lastPosX = startX;
-								this.lastPosY = startY;
-								++this.lastPosZ;
-							}
-
-							return new BlockPos(this.lastPosX, this.lastPosY, this.lastPosZ);
-						}
-					}
-				};
-			}
-		};
+	public static Iterable<BlockPos> iterate(int startX, int startY, int startZ, int endX, int endY, int endZ) {
+		return new BlockPosIterator(startX, startY, startZ, endX, endY, endZ);
 	}
 
 	public BlockPos toImmutable() {
@@ -242,109 +153,5 @@ public class BlockPos extends Vec3i {
 
 	public Vec3 newVec3() {
 		return Vec3.createVectorHelper(getX(), getY(), getZ());
-	}
-
-	public static class MutableBlockPos extends BlockPos {
-		protected int x;
-		protected int y;
-		protected int z;
-
-		public MutableBlockPos() {
-			this(0, 0, 0);
-		}
-
-		public MutableBlockPos(BlockPos pos) {
-			this(pos.getX(), pos.getY(), pos.getZ());
-		}
-
-		public MutableBlockPos(int x_, int y_, int z_) {
-			super(0, 0, 0);
-			this.x = x_;
-			this.y = y_;
-			this.z = z_;
-		}
-
-		@Override
-		public BlockPos add(double x, double y, double z) {
-			return super.add(x, y, z).toImmutable();
-		}
-
-		@Override
-		public BlockPos add(int x, int y, int z) {
-			return super.add(x, y, z).toImmutable();
-		}
-
-		@Override
-		public BlockPos offset(EnumFacing facing, int n) {
-			return super.offset(facing, n).toImmutable();
-		}
-
-		@Override
-		public BlockPos offset(EnumFacing p_190942_1_) {
-			return super.offset(p_190942_1_).toImmutable();
-		}
-
-		@Override
-		public int getX() {
-			return this.x;
-		}
-
-		@Override
-		public int getY() {
-			return this.y;
-		}
-
-		@Override
-		public int getZ() {
-			return this.z;
-		}
-
-		public BlockPos.MutableBlockPos setPos(int xIn, int yIn, int zIn) {
-			this.x = xIn;
-			this.y = yIn;
-			this.z = zIn;
-			return this;
-		}
-
-		public BlockPos.MutableBlockPos setPos(Entity entityIn) {
-			return this.setPos(entityIn.posX, entityIn.posY, entityIn.posZ);
-		}
-
-		public BlockPos.MutableBlockPos setPos(double xIn, double yIn, double zIn) {
-			return this.setPos(MathHelper.floor_double(xIn), MathHelper.floor_double(yIn), MathHelper.floor_double(zIn));
-		}
-
-		public BlockPos.MutableBlockPos setWithOffset(Vec3i p_122160_, ForgeDirection p_122161_) {
-			return setPos(p_122160_.getX() + p_122161_.offsetX, p_122160_.getY() + p_122161_.offsetY, p_122160_.getZ() + p_122161_.offsetZ);
-		}
-
-		public BlockPos.MutableBlockPos setWithOffset(Vec3i p_122155_, int p_122156_, int p_122157_, int p_122158_) {
-			return setPos(p_122155_.getX() + p_122156_, p_122155_.getY() + p_122157_, p_122155_.getZ() + p_122158_);
-		}
-
-		public BlockPos.MutableBlockPos setWithOffset(Vec3i p_175307_, Vec3i p_175308_) {
-			return setPos(p_175307_.getX() + p_175308_.getX(), p_175307_.getY() + p_175308_.getY(), p_175307_.getZ() + p_175308_.getZ());
-		}
-
-		public BlockPos.MutableBlockPos setPos(Vec3i vec) {
-			return this.setPos(vec.getX(), vec.getY(), vec.getZ());
-		}
-
-		public BlockPos.MutableBlockPos move(EnumFacing facing) {
-			return this.move(facing, 1);
-		}
-
-		public BlockPos.MutableBlockPos move(EnumFacing facing, int p_189534_2_) {
-			return this.setPos(this.x + facing.getFrontOffsetX() * p_189534_2_, this.y + facing.getFrontOffsetY() * p_189534_2_, this.z + facing.getFrontOffsetZ() * p_189534_2_);
-		}
-
-		public void setY(int yIn) {
-			this.y = yIn;
-		}
-
-		@Override
-		public BlockPos toImmutable() {
-			return new BlockPos(this);
-		}
 	}
 }

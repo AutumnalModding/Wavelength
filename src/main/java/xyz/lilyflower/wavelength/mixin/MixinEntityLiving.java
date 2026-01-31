@@ -23,17 +23,12 @@ public class MixinEntityLiving {
         EntityLiving entity = (EntityLiving) (Object) this;
 
         Map<EnumFacing, Float> result = new HashMap<>();
-        List<SolarisExtensions.Pair<EnumFacing, Float>>[] sets = new ArrayList[]{
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new ArrayList<>()
-        };
+        List<SolarisExtensions.Pair<EnumFacing, Float>>[] sets = new ArrayList[0];
 
         List<ItemStack> equipment = new ArrayList<>(Arrays.asList(entity.getLastActiveItems()));
         ItemStack held = entity.getHeldItem(); equipment.remove(held);
-        IGravityModifier.populate(equipment.toArray(new ItemStack[0]), IGravityModifier.ContainerType.ARMOUR, sets);
-        if (held != null) IGravityModifier.populate(new ItemStack[]{held}, IGravityModifier.ContainerType.HELD, sets);
+        sets = IGravityModifier.populate(equipment.toArray(new ItemStack[0]), IGravityModifier.ContainerType.ARMOUR, sets);
+        if (held != null) sets = IGravityModifier.populate(new ItemStack[]{held}, IGravityModifier.ContainerType.HELD, sets);
 
         for (List<SolarisExtensions.Pair<EnumFacing, Float>> set : sets) IGravityModifier.process(result, set);
         IGravityModifier.apply(result, entity);

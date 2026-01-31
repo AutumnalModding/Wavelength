@@ -1,4 +1,4 @@
-package xyz.lilyflower.wavelength.content.block.basic;
+package xyz.lilyflower.wavelength.block.misc;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -7,7 +7,7 @@ import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.util.ForgeDirection;
 
-public class BasicPlank extends BlockBasic {
+public class BasicPlank extends BlockTabbable {
     private final String texture;
 
     public BasicPlank(String texture) {

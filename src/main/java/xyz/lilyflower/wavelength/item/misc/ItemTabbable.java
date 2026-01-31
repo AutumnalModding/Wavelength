@@ -1,10 +1,10 @@
-package xyz.lilyflower.wavelength.content.item;
+package xyz.lilyflower.wavelength.item.misc;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 
-public class ItemBasic extends Item {
-    public ItemBasic(CreativeTabs tab) {
+public class ItemTabbable extends Item {
+    public ItemTabbable(CreativeTabs tab) {
         super();
         this.setCreativeTab(tab);
     }

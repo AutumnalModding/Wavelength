@@ -9,7 +9,7 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import org.lwjgl.opengl.GL11;
-import xyz.lilyflower.wavelength.content.entity.EntityGravityBlock;
+import xyz.lilyflower.wavelength.entity.EntityGravityBlock;
 
 public class RenderGravityBlock extends Render {
     private final RenderBlocks render = new RenderBlocks();

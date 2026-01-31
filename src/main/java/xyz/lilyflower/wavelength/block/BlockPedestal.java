@@ -1,4 +1,4 @@
-package xyz.lilyflower.wavelength.content.block;
+package xyz.lilyflower.wavelength.block;
 
 import com.gtnewhorizon.gtnhlib.client.model.ModelISBRH;
 import java.util.ArrayList;
@@ -9,10 +9,11 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import xyz.lilyflower.wavelength.api.BlockTooltippable;
 import xyz.lilyflower.wavelength.api.Tooltipper;
-import xyz.lilyflower.wavelength.content.WavelengthTab;
+import xyz.lilyflower.wavelength.util.WavelengthTab;
 import xyz.lilyflower.wavelength.init.Wavelength;
 import xyz.lilyflower.wavelength.handler.GuiHandler;
-import xyz.lilyflower.wavelength.content.block.entity.TileEntityPedestal;
+import xyz.lilyflower.wavelength.block.entity.TileEntityPedestal;
+import xyz.lilyflower.wavelength.block.entity.TileEntityPedestal.PedestalTier;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
@@ -59,7 +60,7 @@ public class BlockPedestal extends BlockContainer implements BlockTooltippable {
                     return true;
                 }
 
-                player.openGui(Wavelength.INSTANCE, GuiHandler.PEDESTAL_GUI_ID, world, x, y, z);
+                player.openGui(Wavelength.loader, GuiHandler.PEDESTAL_GUI_ID, world, x, y, z);
             }
         }
 
@@ -109,19 +110,21 @@ public class BlockPedestal extends BlockContainer implements BlockTooltippable {
 
                         stack.stackSize -= amount;
 
-                        EntityItem ittem = new EntityItem(world,
-                                        x + offsetX, y + offsetY, z + offsetZ,
-                                        new ItemStack(stack.getItem(), amount, stack.getItemDamage()));
+                        EntityItem item = new EntityItem(
+                                world,
+                                x + offsetX, y + offsetY, z + offsetZ,
+                                new ItemStack(stack.getItem(), amount, stack.getItemDamage())
+                        );
 
                         if (stack.hasTagCompound()) {
-                            ittem.getEntityItem().setTagCompound((NBTTagCompound) stack.getTagCompound().copy());
+                            item.getEntityItem().setTagCompound((NBTTagCompound) stack.getTagCompound().copy());
                         }
 
                         float motion = 0.05F;
-                        ittem.motionX = (float) this.random.nextGaussian() * motion;
-                        ittem.motionY = (float) this.random.nextGaussian() * motion + 0.2F;
-                        ittem.motionZ = (float) this.random.nextGaussian() * motion;
-                        world.spawnEntityInWorld(ittem);
+                        item.motionX = (float) this.random.nextGaussian() * motion;
+                        item.motionY = (float) this.random.nextGaussian() * motion + 0.2F;
+                        item.motionZ = (float) this.random.nextGaussian() * motion;
+                        world.spawnEntityInWorld(item);
                     }
                 }
             }
@@ -159,10 +162,7 @@ public class BlockPedestal extends BlockContainer implements BlockTooltippable {
                 case MOONSTONE -> "§f";
                 default -> "";
             };
-            String name = switch (this.tier) {
-                case CMY -> "§bC§dM§eY";
-                default -> MiscUtils.CapitalizeFirst(this.tier.name().toLowerCase());
-            };
+            String name = this.tier == PedestalTier.CMY ? "§bC§dM§eY" : MiscUtils.properify(this.tier.name().toLowerCase());
             text.add(prefix + name + "§r Variant");
             return text;
         });
